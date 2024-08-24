@@ -1,0 +1,26 @@
+{
+    "name": "@bem-plus/autoloader",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "rspack build"
+    },
+    "files": [
+        "dist/*"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/stefanbaumeler/bem-plus.git"
+    },
+    "author": "Stefan Baumeler",
+    "bugs": {
+        "url": "https://github.com/stefanbaumeler/bem-plus/issues"
+    },
+    "homepage": "https://github.com/stefanbaumeler/bem-plus#readme",
+    "devDependencies": {
+        "@rspack/cli": "^0.7.5",
+        "@rspack/core": "^0.7.5",
+        "ts-loader": "^9.5.1"
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "module": "ESNext",
+        "target": "ES2018",
+        "allowJs": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "strict": true,
+        "noEmit": false
+    }
+}
