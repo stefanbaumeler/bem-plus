@@ -25,7 +25,7 @@ export const moduleTemplate = ({
 
 ${prefix}
 
-import { BemPlusModule } from '@bem-plus/classgenerator/module';
+import { BemPlusModule } from '@bem-plus/class-generator/module';
 ${elementClasses}
 export class ${className} extends BemPlusModule {
     root;

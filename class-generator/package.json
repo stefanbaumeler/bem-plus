@@ -25,6 +25,7 @@
         "ts-loader": "^9.5.1"
     },
     "dependencies": {
+        "colors": "^1.4.0",
         "glob": "^11.0.0",
         "zod": "^3.23.8"
     }

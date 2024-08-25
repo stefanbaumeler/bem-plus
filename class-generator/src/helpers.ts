@@ -1,9 +1,13 @@
+import fs from 'fs'
+
 export const camel = (str: string) => {
+    const addUnderlineToStart = str.startsWith('_')
+
     const camelOrPascal = str
         .replace(/[_-][^_\-A-Z]|(?<=[A-Z])[A-Z]/g, (m) => m.toLowerCase() === m ? m.toUpperCase() : m.toLowerCase())
         .replace(/[-_]/g, '')
 
-    return `${camelOrPascal.charAt(0).toLowerCase()}${camelOrPascal.slice(1)}`
+    return `${addUnderlineToStart ? '_' : ''}${camelOrPascal.charAt(0).toLowerCase()}${camelOrPascal.slice(1)}`
 }
 
 export const pascal = (...strings: string[]) => {
@@ -31,3 +35,22 @@ export const indent = (content: string, indentation: number) => {
 export const angleType = (typeString: string, isTypeScript: boolean) => isTypeScript ? `<${typeString}>` : ''
 
 export const colonType = (typeString: string, isTypeScript: boolean) => isTypeScript ? `: ${typeString}` : ''
+
+export const getFileContents = async (paths: string[]) => {
+    const filePromises = paths.map((filePath) => fs.promises.readFile(filePath))
+    const settled = await Promise.allSettled(filePromises)
+
+    return settled.map((result) => {
+        if (result.status === 'fulfilled') {
+            return {
+                success: true,
+                contents: result.value.toString()
+            }
+        }
+
+        return {
+            success: false,
+            contents: ''
+        }
+    })
+}

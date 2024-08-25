@@ -290,160 +290,1148 @@ function expand(str, isTop) {
 
 
 }),
-"./src/generator/generator.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"./node_modules/colors/lib/colors.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+/*
+
+The MIT License (MIT)
+
+Original Library
+  - Copyright (c) Marak Squires
+
+Additional functionality
+ - Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+var colors = {};
+module['exports'] = colors;
+
+colors.themes = {};
+
+var util = __webpack_require__(/*! util */ "util");
+var ansiStyles = colors.styles = __webpack_require__(/*! ./styles */ "./node_modules/colors/lib/styles.js");
+var defineProps = Object.defineProperties;
+var newLineRegex = new RegExp(/[\r\n]+/g);
+
+colors.supportsColor = (__webpack_require__(/*! ./system/supports-colors */ "./node_modules/colors/lib/system/supports-colors.js")/* .supportsColor */.supportsColor);
+
+if (typeof colors.enabled === 'undefined') {
+  colors.enabled = colors.supportsColor() !== false;
+}
+
+colors.enable = function() {
+  colors.enabled = true;
+};
+
+colors.disable = function() {
+  colors.enabled = false;
+};
+
+colors.stripColors = colors.strip = function(str) {
+  return ('' + str).replace(/\x1B\[\d+m/g, '');
+};
+
+// eslint-disable-next-line no-unused-vars
+var stylize = colors.stylize = function stylize(str, style) {
+  if (!colors.enabled) {
+    return str+'';
+  }
+
+  var styleMap = ansiStyles[style];
+
+  // Stylize should work for non-ANSI styles, too
+  if(!styleMap && style in colors){
+    // Style maps like trap operate as functions on strings;
+    // they don't have properties like open or close.
+    return colors[style](str);
+  }
+
+  return styleMap.open + str + styleMap.close;
+};
+
+var matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
+var escapeStringRegexp = function(str) {
+  if (typeof str !== 'string') {
+    throw new TypeError('Expected a string');
+  }
+  return str.replace(matchOperatorsRe, '\\$&');
+};
+
+function build(_styles) {
+  var builder = function builder() {
+    return applyStyle.apply(builder, arguments);
+  };
+  builder._styles = _styles;
+  // __proto__ is used because we must return a function, but there is
+  // no way to create a function with a different prototype.
+  builder.__proto__ = proto;
+  return builder;
+}
+
+var styles = (function() {
+  var ret = {};
+  ansiStyles.grey = ansiStyles.gray;
+  Object.keys(ansiStyles).forEach(function(key) {
+    ansiStyles[key].closeRe =
+      new RegExp(escapeStringRegexp(ansiStyles[key].close), 'g');
+    ret[key] = {
+      get: function() {
+        return build(this._styles.concat(key));
+      },
+    };
+  });
+  return ret;
+})();
+
+var proto = defineProps(function colors() {}, styles);
+
+function applyStyle() {
+  var args = Array.prototype.slice.call(arguments);
+
+  var str = args.map(function(arg) {
+    // Use weak equality check so we can colorize null/undefined in safe mode
+    if (arg != null && arg.constructor === String) {
+      return arg;
+    } else {
+      return util.inspect(arg);
+    }
+  }).join(' ');
+
+  if (!colors.enabled || !str) {
+    return str;
+  }
+
+  var newLinesPresent = str.indexOf('\n') != -1;
+
+  var nestedStyles = this._styles;
+
+  var i = nestedStyles.length;
+  while (i--) {
+    var code = ansiStyles[nestedStyles[i]];
+    str = code.open + str.replace(code.closeRe, code.open) + code.close;
+    if (newLinesPresent) {
+      str = str.replace(newLineRegex, function(match) {
+        return code.close + match + code.open;
+      });
+    }
+  }
+
+  return str;
+}
+
+colors.setTheme = function(theme) {
+  if (typeof theme === 'string') {
+    console.log('colors.setTheme now only accepts an object, not a string.  ' +
+      'If you are trying to set a theme from a file, it is now your (the ' +
+      'caller\'s) responsibility to require the file.  The old syntax ' +
+      'looked like colors.setTheme(__dirname + ' +
+      '\'/../themes/generic-logging.js\'); The new syntax looks like '+
+      'colors.setTheme(require(__dirname + ' +
+      '\'/../themes/generic-logging.js\'));');
+    return;
+  }
+  for (var style in theme) {
+    (function(style) {
+      colors[style] = function(str) {
+        if (typeof theme[style] === 'object') {
+          var out = str;
+          for (var i in theme[style]) {
+            out = colors[theme[style][i]](out);
+          }
+          return out;
+        }
+        return colors[theme[style]](str);
+      };
+    })(style);
+  }
+};
+
+function init() {
+  var ret = {};
+  Object.keys(styles).forEach(function(name) {
+    ret[name] = {
+      get: function() {
+        return build([name]);
+      },
+    };
+  });
+  return ret;
+}
+
+var sequencer = function sequencer(map, str) {
+  var exploded = str.split('');
+  exploded = exploded.map(map);
+  return exploded.join('');
+};
+
+// custom formatter methods
+colors.trap = __webpack_require__(/*! ./custom/trap */ "./node_modules/colors/lib/custom/trap.js");
+colors.zalgo = __webpack_require__(/*! ./custom/zalgo */ "./node_modules/colors/lib/custom/zalgo.js");
+
+// maps
+colors.maps = {};
+colors.maps.america = __webpack_require__(/*! ./maps/america */ "./node_modules/colors/lib/maps/america.js")(colors);
+colors.maps.zebra = __webpack_require__(/*! ./maps/zebra */ "./node_modules/colors/lib/maps/zebra.js")(colors);
+colors.maps.rainbow = __webpack_require__(/*! ./maps/rainbow */ "./node_modules/colors/lib/maps/rainbow.js")(colors);
+colors.maps.random = __webpack_require__(/*! ./maps/random */ "./node_modules/colors/lib/maps/random.js")(colors);
+
+for (var map in colors.maps) {
+  (function(map) {
+    colors[map] = function(str) {
+      return sequencer(colors.maps[map], str);
+    };
+  })(map);
+}
+
+defineProps(colors, init());
+
+
+}),
+"./node_modules/colors/lib/custom/trap.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+module['exports'] = function runTheTrap(text, options) {
+  var result = '';
+  text = text || 'Run the trap, drop the bass';
+  text = text.split('');
+  var trap = {
+    a: ['\u0040', '\u0104', '\u023a', '\u0245', '\u0394', '\u039b', '\u0414'],
+    b: ['\u00df', '\u0181', '\u0243', '\u026e', '\u03b2', '\u0e3f'],
+    c: ['\u00a9', '\u023b', '\u03fe'],
+    d: ['\u00d0', '\u018a', '\u0500', '\u0501', '\u0502', '\u0503'],
+    e: ['\u00cb', '\u0115', '\u018e', '\u0258', '\u03a3', '\u03be', '\u04bc',
+      '\u0a6c'],
+    f: ['\u04fa'],
+    g: ['\u0262'],
+    h: ['\u0126', '\u0195', '\u04a2', '\u04ba', '\u04c7', '\u050a'],
+    i: ['\u0f0f'],
+    j: ['\u0134'],
+    k: ['\u0138', '\u04a0', '\u04c3', '\u051e'],
+    l: ['\u0139'],
+    m: ['\u028d', '\u04cd', '\u04ce', '\u0520', '\u0521', '\u0d69'],
+    n: ['\u00d1', '\u014b', '\u019d', '\u0376', '\u03a0', '\u048a'],
+    o: ['\u00d8', '\u00f5', '\u00f8', '\u01fe', '\u0298', '\u047a', '\u05dd',
+      '\u06dd', '\u0e4f'],
+    p: ['\u01f7', '\u048e'],
+    q: ['\u09cd'],
+    r: ['\u00ae', '\u01a6', '\u0210', '\u024c', '\u0280', '\u042f'],
+    s: ['\u00a7', '\u03de', '\u03df', '\u03e8'],
+    t: ['\u0141', '\u0166', '\u0373'],
+    u: ['\u01b1', '\u054d'],
+    v: ['\u05d8'],
+    w: ['\u0428', '\u0460', '\u047c', '\u0d70'],
+    x: ['\u04b2', '\u04fe', '\u04fc', '\u04fd'],
+    y: ['\u00a5', '\u04b0', '\u04cb'],
+    z: ['\u01b5', '\u0240'],
+  };
+  text.forEach(function(c) {
+    c = c.toLowerCase();
+    var chars = trap[c] || [' '];
+    var rand = Math.floor(Math.random() * chars.length);
+    if (typeof trap[c] !== 'undefined') {
+      result += trap[c][rand];
+    } else {
+      result += c;
+    }
+  });
+  return result;
+};
+
+
+}),
+"./node_modules/colors/lib/custom/zalgo.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+// please no
+module['exports'] = function zalgo(text, options) {
+  text = text || '   he is here   ';
+  var soul = {
+    'up': [
+      '̍', '̎', '̄', '̅',
+      '̿', '̑', '̆', '̐',
+      '͒', '͗', '͑', '̇',
+      '̈', '̊', '͂', '̓',
+      '̈', '͊', '͋', '͌',
+      '̃', '̂', '̌', '͐',
+      '̀', '́', '̋', '̏',
+      '̒', '̓', '̔', '̽',
+      '̉', 'ͣ', 'ͤ', 'ͥ',
+      'ͦ', 'ͧ', 'ͨ', 'ͩ',
+      'ͪ', 'ͫ', 'ͬ', 'ͭ',
+      'ͮ', 'ͯ', '̾', '͛',
+      '͆', '̚',
+    ],
+    'down': [
+      '̖', '̗', '̘', '̙',
+      '̜', '̝', '̞', '̟',
+      '̠', '̤', '̥', '̦',
+      '̩', '̪', '̫', '̬',
+      '̭', '̮', '̯', '̰',
+      '̱', '̲', '̳', '̹',
+      '̺', '̻', '̼', 'ͅ',
+      '͇', '͈', '͉', '͍',
+      '͎', '͓', '͔', '͕',
+      '͖', '͙', '͚', '̣',
+    ],
+    'mid': [
+      '̕', '̛', '̀', '́',
+      '͘', '̡', '̢', '̧',
+      '̨', '̴', '̵', '̶',
+      '͜', '͝', '͞',
+      '͟', '͠', '͢', '̸',
+      '̷', '͡', ' ҉',
+    ],
+  };
+  var all = [].concat(soul.up, soul.down, soul.mid);
+
+  function randomNumber(range) {
+    var r = Math.floor(Math.random() * range);
+    return r;
+  }
+
+  function isChar(character) {
+    var bool = false;
+    all.filter(function(i) {
+      bool = (i === character);
+    });
+    return bool;
+  }
+
+
+  function heComes(text, options) {
+    var result = '';
+    var counts;
+    var l;
+    options = options || {};
+    options['up'] =
+      typeof options['up'] !== 'undefined' ? options['up'] : true;
+    options['mid'] =
+      typeof options['mid'] !== 'undefined' ? options['mid'] : true;
+    options['down'] =
+      typeof options['down'] !== 'undefined' ? options['down'] : true;
+    options['size'] =
+      typeof options['size'] !== 'undefined' ? options['size'] : 'maxi';
+    text = text.split('');
+    for (l in text) {
+      if (isChar(l)) {
+        continue;
+      }
+      result = result + text[l];
+      counts = {'up': 0, 'down': 0, 'mid': 0};
+      switch (options.size) {
+        case 'mini':
+          counts.up = randomNumber(8);
+          counts.mid = randomNumber(2);
+          counts.down = randomNumber(8);
+          break;
+        case 'maxi':
+          counts.up = randomNumber(16) + 3;
+          counts.mid = randomNumber(4) + 1;
+          counts.down = randomNumber(64) + 3;
+          break;
+        default:
+          counts.up = randomNumber(8) + 1;
+          counts.mid = randomNumber(6) / 2;
+          counts.down = randomNumber(8) + 1;
+          break;
+      }
+
+      var arr = ['up', 'mid', 'down'];
+      for (var d in arr) {
+        var index = arr[d];
+        for (var i = 0; i <= counts[index]; i++) {
+          if (options[index]) {
+            result = result + soul[index][randomNumber(soul[index].length)];
+          }
+        }
+      }
+    }
+    return result;
+  }
+  // don't summon him
+  return heComes(text, options);
+};
+
+
+
+}),
+"./node_modules/colors/lib/extendStringPrototype.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+var colors = __webpack_require__(/*! ./colors */ "./node_modules/colors/lib/colors.js");
+
+module['exports'] = function() {
+  //
+  // Extends prototype of native string object to allow for "foo".red syntax
+  //
+  var addProperty = function(color, func) {
+    String.prototype.__defineGetter__(color, func);
+  };
+
+  addProperty('strip', function() {
+    return colors.strip(this);
+  });
+
+  addProperty('stripColors', function() {
+    return colors.strip(this);
+  });
+
+  addProperty('trap', function() {
+    return colors.trap(this);
+  });
+
+  addProperty('zalgo', function() {
+    return colors.zalgo(this);
+  });
+
+  addProperty('zebra', function() {
+    return colors.zebra(this);
+  });
+
+  addProperty('rainbow', function() {
+    return colors.rainbow(this);
+  });
+
+  addProperty('random', function() {
+    return colors.random(this);
+  });
+
+  addProperty('america', function() {
+    return colors.america(this);
+  });
+
+  //
+  // Iterate through all default styles and colors
+  //
+  var x = Object.keys(colors.styles);
+  x.forEach(function(style) {
+    addProperty(style, function() {
+      return colors.stylize(this, style);
+    });
+  });
+
+  function applyTheme(theme) {
+    //
+    // Remark: This is a list of methods that exist
+    // on String that you should not overwrite.
+    //
+    var stringPrototypeBlacklist = [
+      '__defineGetter__', '__defineSetter__', '__lookupGetter__',
+      '__lookupSetter__', 'charAt', 'constructor', 'hasOwnProperty',
+      'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', 'toString',
+      'valueOf', 'charCodeAt', 'indexOf', 'lastIndexOf', 'length',
+      'localeCompare', 'match', 'repeat', 'replace', 'search', 'slice',
+      'split', 'substring', 'toLocaleLowerCase', 'toLocaleUpperCase',
+      'toLowerCase', 'toUpperCase', 'trim', 'trimLeft', 'trimRight',
+    ];
+
+    Object.keys(theme).forEach(function(prop) {
+      if (stringPrototypeBlacklist.indexOf(prop) !== -1) {
+        console.log('warn: '.red + ('String.prototype' + prop).magenta +
+          ' is probably something you don\'t want to override.  ' +
+          'Ignoring style name');
+      } else {
+        if (typeof(theme[prop]) === 'string') {
+          colors[prop] = colors[theme[prop]];
+          addProperty(prop, function() {
+            return colors[prop](this);
+          });
+        } else {
+          var themePropApplicator = function(str) {
+            var ret = str || this;
+            for (var t = 0; t < theme[prop].length; t++) {
+              ret = colors[theme[prop][t]](ret);
+            }
+            return ret;
+          };
+          addProperty(prop, themePropApplicator);
+          colors[prop] = function(str) {
+            return themePropApplicator(str);
+          };
+        }
+      }
+    });
+  }
+
+  colors.setTheme = function(theme) {
+    if (typeof theme === 'string') {
+      console.log('colors.setTheme now only accepts an object, not a string. ' +
+        'If you are trying to set a theme from a file, it is now your (the ' +
+        'caller\'s) responsibility to require the file.  The old syntax ' +
+        'looked like colors.setTheme(__dirname + ' +
+        '\'/../themes/generic-logging.js\'); The new syntax looks like '+
+        'colors.setTheme(require(__dirname + ' +
+        '\'/../themes/generic-logging.js\'));');
+      return;
+    } else {
+      applyTheme(theme);
+    }
+  };
+};
+
+
+}),
+"./node_modules/colors/lib/index.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+var colors = __webpack_require__(/*! ./colors */ "./node_modules/colors/lib/colors.js");
+module['exports'] = colors;
+
+// Remark: By default, colors will add style properties to String.prototype.
+//
+// If you don't wish to extend String.prototype, you can do this instead and
+// native String will not be touched:
+//
+//   var colors = require('colors/safe);
+//   colors.red("foo")
+//
+//
+__webpack_require__(/*! ./extendStringPrototype */ "./node_modules/colors/lib/extendStringPrototype.js")();
+
+
+}),
+"./node_modules/colors/lib/maps/america.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+module['exports'] = function(colors) {
+  return function(letter, i, exploded) {
+    if (letter === ' ') return letter;
+    switch (i%3) {
+      case 0: return colors.red(letter);
+      case 1: return colors.white(letter);
+      case 2: return colors.blue(letter);
+    }
+  };
+};
+
+
+}),
+"./node_modules/colors/lib/maps/rainbow.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+module['exports'] = function(colors) {
+  // RoY G BiV
+  var rainbowColors = ['red', 'yellow', 'green', 'blue', 'magenta'];
+  return function(letter, i, exploded) {
+    if (letter === ' ') {
+      return letter;
+    } else {
+      return colors[rainbowColors[i++ % rainbowColors.length]](letter);
+    }
+  };
+};
+
+
+
+}),
+"./node_modules/colors/lib/maps/random.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+module['exports'] = function(colors) {
+  var available = ['underline', 'inverse', 'grey', 'yellow', 'red', 'green',
+    'blue', 'white', 'cyan', 'magenta', 'brightYellow', 'brightRed',
+    'brightGreen', 'brightBlue', 'brightWhite', 'brightCyan', 'brightMagenta'];
+  return function(letter, i, exploded) {
+    return letter === ' ' ? letter :
+      colors[
+          available[Math.round(Math.random() * (available.length - 2))]
+      ](letter);
+  };
+};
+
+
+}),
+"./node_modules/colors/lib/maps/zebra.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+module['exports'] = function(colors) {
+  return function(letter, i, exploded) {
+    return i % 2 === 0 ? letter : colors.inverse(letter);
+  };
+};
+
+
+}),
+"./node_modules/colors/lib/styles.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+/* module decorator */ module = __webpack_require__.nmd(module);
+/*
+The MIT License (MIT)
+
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+var styles = {};
+module['exports'] = styles;
+
+var codes = {
+  reset: [0, 0],
+
+  bold: [1, 22],
+  dim: [2, 22],
+  italic: [3, 23],
+  underline: [4, 24],
+  inverse: [7, 27],
+  hidden: [8, 28],
+  strikethrough: [9, 29],
+
+  black: [30, 39],
+  red: [31, 39],
+  green: [32, 39],
+  yellow: [33, 39],
+  blue: [34, 39],
+  magenta: [35, 39],
+  cyan: [36, 39],
+  white: [37, 39],
+  gray: [90, 39],
+  grey: [90, 39],
+
+  brightRed: [91, 39],
+  brightGreen: [92, 39],
+  brightYellow: [93, 39],
+  brightBlue: [94, 39],
+  brightMagenta: [95, 39],
+  brightCyan: [96, 39],
+  brightWhite: [97, 39],
+
+  bgBlack: [40, 49],
+  bgRed: [41, 49],
+  bgGreen: [42, 49],
+  bgYellow: [43, 49],
+  bgBlue: [44, 49],
+  bgMagenta: [45, 49],
+  bgCyan: [46, 49],
+  bgWhite: [47, 49],
+  bgGray: [100, 49],
+  bgGrey: [100, 49],
+
+  bgBrightRed: [101, 49],
+  bgBrightGreen: [102, 49],
+  bgBrightYellow: [103, 49],
+  bgBrightBlue: [104, 49],
+  bgBrightMagenta: [105, 49],
+  bgBrightCyan: [106, 49],
+  bgBrightWhite: [107, 49],
+
+  // legacy styles for colors pre v1.0.0
+  blackBG: [40, 49],
+  redBG: [41, 49],
+  greenBG: [42, 49],
+  yellowBG: [43, 49],
+  blueBG: [44, 49],
+  magentaBG: [45, 49],
+  cyanBG: [46, 49],
+  whiteBG: [47, 49],
+
+};
+
+Object.keys(codes).forEach(function(key) {
+  var val = codes[key];
+  var style = styles[key] = [];
+  style.open = '\u001b[' + val[0] + 'm';
+  style.close = '\u001b[' + val[1] + 'm';
+});
+
+
+}),
+"./node_modules/colors/lib/system/has-flag.js": (function (module) {
+"use strict";
+/*
+MIT License
+
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+
+
+module.exports = function(flag, argv) {
+  argv = argv || process.argv;
+
+  var terminatorPos = argv.indexOf('--');
+  var prefix = /^-{1,2}/.test(flag) ? '' : '--';
+  var pos = argv.indexOf(prefix + flag);
+
+  return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
+};
+
+
+}),
+"./node_modules/colors/lib/system/supports-colors.js": (function (module, __unused_webpack_exports, __webpack_require__) {
+"use strict";
+/*
+The MIT License (MIT)
+
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+
+
+var os = __webpack_require__(/*! os */ "os");
+var hasFlag = __webpack_require__(/*! ./has-flag.js */ "./node_modules/colors/lib/system/has-flag.js");
+
+var env = process.env;
+
+var forceColor = void 0;
+if (hasFlag('no-color') || hasFlag('no-colors') || hasFlag('color=false')) {
+  forceColor = false;
+} else if (hasFlag('color') || hasFlag('colors') || hasFlag('color=true')
+           || hasFlag('color=always')) {
+  forceColor = true;
+}
+if ('FORCE_COLOR' in env) {
+  forceColor = env.FORCE_COLOR.length === 0
+    || parseInt(env.FORCE_COLOR, 10) !== 0;
+}
+
+function translateLevel(level) {
+  if (level === 0) {
+    return false;
+  }
+
+  return {
+    level: level,
+    hasBasic: true,
+    has256: level >= 2,
+    has16m: level >= 3,
+  };
+}
+
+function supportsColor(stream) {
+  if (forceColor === false) {
+    return 0;
+  }
+
+  if (hasFlag('color=16m') || hasFlag('color=full')
+      || hasFlag('color=truecolor')) {
+    return 3;
+  }
+
+  if (hasFlag('color=256')) {
+    return 2;
+  }
+
+  if (stream && !stream.isTTY && forceColor !== true) {
+    return 0;
+  }
+
+  var min = forceColor ? 1 : 0;
+
+  if (process.platform === 'win32') {
+    // Node.js 7.5.0 is the first version of Node.js to include a patch to
+    // libuv that enables 256 color output on Windows. Anything earlier and it
+    // won't work. However, here we target Node.js 8 at minimum as it is an LTS
+    // release, and Node.js 7 is not. Windows 10 build 10586 is the first
+    // Windows release that supports 256 colors. Windows 10 build 14931 is the
+    // first release that supports 16m/TrueColor.
+    var osRelease = os.release().split('.');
+    if (Number(process.versions.node.split('.')[0]) >= 8
+        && Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
+      return Number(osRelease[2]) >= 14931 ? 3 : 2;
+    }
+
+    return 1;
+  }
+
+  if ('CI' in env) {
+    if (['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI'].some(function(sign) {
+      return sign in env;
+    }) || env.CI_NAME === 'codeship') {
+      return 1;
+    }
+
+    return min;
+  }
+
+  if ('TEAMCITY_VERSION' in env) {
+    return (/^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0
+    );
+  }
+
+  if ('TERM_PROGRAM' in env) {
+    var version = parseInt((env.TERM_PROGRAM_VERSION || '').split('.')[0], 10);
+
+    switch (env.TERM_PROGRAM) {
+      case 'iTerm.app':
+        return version >= 3 ? 3 : 2;
+      case 'Hyper':
+        return 3;
+      case 'Apple_Terminal':
+        return 2;
+      // No default
+    }
+  }
+
+  if (/-256(color)?$/i.test(env.TERM)) {
+    return 2;
+  }
+
+  if (/^screen|^xterm|^vt100|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
+    return 1;
+  }
+
+  if ('COLORTERM' in env) {
+    return 1;
+  }
+
+  if (env.TERM === 'dumb') {
+    return min;
+  }
+
+  return min;
+}
+
+function getSupportLevel(stream) {
+  var level = supportsColor(stream);
+  return translateLevel(level);
+}
+
+module.exports = {
+  supportsColor: getSupportLevel,
+  stdout: getSupportLevel(process.stdout),
+  stderr: getSupportLevel(process.stderr),
+};
+
+
+}),
+"./src/generator/classes/Barrel.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-  BemPlusClassGenerator: function() { return BemPlusClassGenerator; }
+  Barrel: function() { return Barrel; }
 });
-/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! fs */ "fs");
-/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */var glob__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! glob */ "./node_modules/glob/dist/esm/index.js");
-/* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers */ "./src/helpers.ts");
-/* harmony import */var _templates_module__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./templates/module */ "./src/generator/templates/module.ts");
-/* harmony import */var _templates_elementClass__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./templates/elementClass */ "./src/generator/templates/elementClass.ts");
-/* harmony import */var _templates_modifier__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./templates/modifier */ "./src/generator/templates/modifier.ts");
-/* harmony import */var _templates_elementReference__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./templates/elementReference */ "./src/generator/templates/elementReference.ts");
-/* harmony import */var _templates_rootReference__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./templates/rootReference */ "./src/generator/templates/rootReference.ts");
-/* harmony import */var _templates_elementProperty__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./templates/elementProperty */ "./src/generator/templates/elementProperty.ts");
-/* harmony import */var _templates_importExport__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./templates/importExport */ "./src/generator/templates/importExport.ts");
-/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! node:path */ "node:path");
-/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */var _types__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./types */ "./src/generator/types.ts");
+/* harmony import */var _const__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../const */ "./src/generator/const.ts");
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! node:path */ "node:path");
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */var _types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../types */ "./src/generator/types.ts");
+/* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../helpers */ "./src/helpers.ts");
+/* harmony import */var _getFileContents__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../getFileContents */ "./src/generator/getFileContents.ts");
 
 
 
 
 
 
-
-
-
-
-
-
-const AUTO_GENERATED_DISCLAIMER = 'This file was automatically generated by the bem-plus package.';
-class BemPlusClassGenerator {
-    constructor(config, distPath) {
+class Barrel {
+    constructor(config, blocks) {
         this.config = config;
-        this.distPath = distPath;
-        this.index = {};
+        this.blocks = blocks;
         this.matchers = {
-            dist: {
-                bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
-                blockElement: new RegExp(`[^(\\d.\\n]*${this.config.input.separators.element}.+?(?=${this.config.input.separators.modifier}|[ .,[:#{)>+])`, 'g'),
-                blockElementModifier: new RegExp(`(?<!(var\\(|{|;))[^(\\d.\\n!{]*${this.config.input.separators.modifier}[^ .,[:#{)>+]*`, 'g')
-            },
-            scss: {
-                element: (block) => new RegExp(`(?<=&${this.config.input.separators.element})[^ {(]*(?=.*\\n.*@include ${block}${this.config.input.separators.mixinElement})`, 'g'),
-                elementProps: (block, element) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}${element}.*\\()[^)]*`, 'g'),
-                hasIndex: (block) => new RegExp(`@mixin ${block}([ \\t(]*[({]|[\\s\\S]).*[\\s\\S].*\\.${block}`),
-                hasAnElement: (block) => new RegExp(`@mixin ${block}${this.config.input.separators.mixinElement}.*`),
-                removeComments: (input) => input.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, '')
-            }
+            export: new RegExp('(?<=export \\* from [\'"`]).*(?=[\'"`])', 'g')
         };
-        this.outputPath = config.output.mode === _types__WEBPACK_IMPORTED_MODULE_11__.EOutputMode.node_modules ? '/node_modules/@bem-plus/generated' : config.output.path;
     }
-    async generate() {
-        this.validateSeparators();
-        const dist = await this.getBuiltContent();
-        const modifiers = dist.match(this.matchers.dist.blockElementModifier) || [];
-        if (this.config.strategy === _types__WEBPACK_IMPORTED_MODULE_11__.EStrategy.plus) {
-            const blocks = await this.getPlusBlocks(dist);
-            this.index = await this.createIndex({
-                blocks,
-                elements: this.getPlusElements(blocks),
-                modifiers
-            });
-        }
-        else {
-            const elements = dist.match(this.matchers.dist.blockElement) || [];
-            this.index = await this.createIndex({
-                blocks: this.getBlocksFromDist(elements, modifiers),
-                elements,
-                modifiers
-            });
-        }
-        await this.writeModules();
-        await this.clearObsoleteModules();
-        await this.createBarrel();
-        this.config.output.onComplete();
-    }
-    validateSeparators() {
-        if (['-', ''].includes(this.config.input.separators.modifier)) {
-        }
-        if (['-', ''].includes(this.config.input.separators.element)) {
-        }
-        if (['--', '__'].includes(this.config.input.separators.mixinElement)) {
-        }
-    }
-    getBlocksFromDist(elements, modifiers) {
-        const blocksFromElements = elements.map((element) => element.split(this.config.input.separators.element)[0]);
-        const blocksFromModifiers = modifiers.map((modifier) => modifier.split(this.matchers.dist.bemSeparator)[0]);
-        return (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.unique)([...blocksFromElements, ...blocksFromModifiers])
-            .filter((block) => !this.config.input.excludeBlocks.includes(block))
-            .map((block) => ({
-            name: block,
-            input: '',
-            output: this.getPath(block)
-        }));
-    }
-    getPlusElements(blocks) {
-        return blocks.flatMap((block) => {
-            const matches = block.input.match(this.matchers.scss.element(block.name));
-            return matches ? matches.map((match) => `${block.name}${this.config.input.separators.element}${match.trim()}`) : [];
+    async write() {
+        const autoGeneratedDisclaimerString = `/* ${_const__WEBPACK_IMPORTED_MODULE_0__.AUTO_GENERATED_DISCLAIMER} */`;
+        const importsString = this.blocks.filter((block) => block.module.length).map((block) => block.importExport).join('\n');
+        const fullIndex = `${autoGeneratedDisclaimerString}\n\n${importsString}`;
+        const fileName = `index.${this.config.output.language}`;
+        const filePath = node_path__WEBPACK_IMPORTED_MODULE_1___default().resolve(this.config.output.path, fileName);
+        await fs__WEBPACK_IMPORTED_MODULE_2___default().promises.writeFile(filePath, fullIndex, {
+            flag: 'w'
         });
     }
-    async getFileContents(paths) {
-        const filePromises = paths.map((filePath) => fs__WEBPACK_IMPORTED_MODULE_0___default().promises.readFile(filePath));
-        const settled = await Promise.allSettled(filePromises);
-        return settled.map((result) => {
-            if (result.status === 'fulfilled') {
+    async clearObsoleteModules() {
+        const otherExt = this.config.output.language === _types__WEBPACK_IMPORTED_MODULE_3__.EOutputLanguage.ts ? _types__WEBPACK_IMPORTED_MODULE_3__.EOutputLanguage.js : _types__WEBPACK_IMPORTED_MODULE_3__.EOutputLanguage.ts;
+        let index = await (0,_getFileContents__WEBPACK_IMPORTED_MODULE_5__.getFileContents)([node_path__WEBPACK_IMPORTED_MODULE_1___default().resolve(this.config.output.path, `index.${this.config.output.language}`)]);
+        if (!index[0].success) {
+            index = await (0,_getFileContents__WEBPACK_IMPORTED_MODULE_5__.getFileContents)([node_path__WEBPACK_IMPORTED_MODULE_1___default().resolve(this.config.output.path, `index.${otherExt}`)]);
+            if (!index[0].success) {
+                return;
+            }
+        }
+        const oldModulePaths = (index[0].contents.match(this.matchers.export) || [])
+            .map((oldRelativePath) => node_path__WEBPACK_IMPORTED_MODULE_1___default().resolve(this.config.output.path, oldRelativePath));
+        const newModulePaths = this.blocks
+            .filter((block) => block.module.length)
+            .map((block) => {
+            const parsed = node_path__WEBPACK_IMPORTED_MODULE_1___default().parse(block.output);
+            return node_path__WEBPACK_IMPORTED_MODULE_1___default().resolve(node_path__WEBPACK_IMPORTED_MODULE_1___default().join(parsed.dir, parsed.name));
+        });
+        const obsoleteModulePaths = oldModulePaths
+            .filter((oldModulePath) => !newModulePaths.includes(oldModulePath))
+            .map((oldModulePath) => node_path__WEBPACK_IMPORTED_MODULE_1___default().resolve(this.config.output.path, oldModulePath));
+        const obsoleteModulePathsWithCurrentExt = obsoleteModulePaths.map((obsoleteModulePath) => `${obsoleteModulePath}.${this.config.output.language}`);
+        const fileContentsWithCurrentExt = await (0,_getFileContents__WEBPACK_IMPORTED_MODULE_5__.getFileContents)(obsoleteModulePathsWithCurrentExt);
+        const confirmedModules = [];
+        const retryWithOldExt = [];
+        fileContentsWithCurrentExt.forEach((fileContent, key) => {
+            if (!fileContent.success) {
+                retryWithOldExt.push(obsoleteModulePaths[key]);
+            }
+            else if (fileContent.contents.includes(_const__WEBPACK_IMPORTED_MODULE_0__.AUTO_GENERATED_DISCLAIMER)) {
+                confirmedModules.push(obsoleteModulePathsWithCurrentExt[key]);
+            }
+        });
+        if (retryWithOldExt.length) {
+            const obsoleteModulePathsWithOldExt = retryWithOldExt.map((obsoleteModulePath) => `${obsoleteModulePath}.${otherExt}`);
+            const fileContentsWithOldExt = await (0,_getFileContents__WEBPACK_IMPORTED_MODULE_5__.getFileContents)(obsoleteModulePathsWithOldExt);
+            fileContentsWithOldExt.forEach((fileContent, key) => {
+                if (fileContent.success && fileContent.contents.includes(_const__WEBPACK_IMPORTED_MODULE_0__.AUTO_GENERATED_DISCLAIMER)) {
+                    confirmedModules.push(obsoleteModulePathsWithCurrentExt[key]);
+                }
+            });
+        }
+        const unlinkPromises = confirmedModules.map((obsoleteModule) => {
+            const fullPath = node_path__WEBPACK_IMPORTED_MODULE_1___default().resolve(this.config.output.path, obsoleteModule);
+            return fs__WEBPACK_IMPORTED_MODULE_2___default().promises.unlink(fullPath);
+        });
+        await Promise.all(unlinkPromises);
+        (0,_helpers__WEBPACK_IMPORTED_MODULE_4__.unique)(confirmedModules.map((module) => node_path__WEBPACK_IMPORTED_MODULE_1___default().dirname(module))).forEach((dir) => {
+            this.recursivelyDeleteEmptyDir(dir);
+        });
+    }
+    recursivelyDeleteEmptyDir(dir) {
+        const isEmpty = fs__WEBPACK_IMPORTED_MODULE_2___default().readdirSync(dir).length === 0;
+        if (isEmpty) {
+            fs__WEBPACK_IMPORTED_MODULE_2___default().rmdirSync(dir);
+            this.recursivelyDeleteEmptyDir(node_path__WEBPACK_IMPORTED_MODULE_1___default().resolve(dir, '..'));
+        }
+    }
+}
+
+
+}),
+"./src/generator/classes/Block.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  Block: function() { return Block; }
+});
+/* harmony import */var _templates_module__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../templates/module */ "./src/generator/templates/module.ts");
+/* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../helpers */ "./src/helpers.ts");
+/* harmony import */var _types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../types */ "./src/generator/types.ts");
+/* harmony import */var _templates_rootReference__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../templates/rootReference */ "./src/generator/templates/rootReference.ts");
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! node:path */ "node:path");
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */var _templates_importExport__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../templates/importExport */ "./src/generator/templates/importExport.ts");
+/* harmony import */var _const__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../const */ "./src/generator/const.ts");
+
+
+
+
+
+
+
+
+class Block {
+    constructor(config, allModifiers, name = '') {
+        this.config = config;
+        this.allModifiers = allModifiers;
+        this.name = name;
+        this.elements = [];
+        this.output = '';
+        this.module = '';
+        this.importExport = '';
+    }
+    generateModule() {
+        const isTypeScript = this.config.output.language === _types__WEBPACK_IMPORTED_MODULE_2__.EOutputLanguage.ts;
+        const rootReference = (0,_templates_rootReference__WEBPACK_IMPORTED_MODULE_3__.rootReferenceTemplate)({
+            isTypeScript,
+            className: (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.pascal)(this.name)
+        });
+        const elementTemplates = this.elements.map((element) => element.generateTemplates(this.name, isTypeScript));
+        this.module = (0,_templates_module__WEBPACK_IMPORTED_MODULE_0__.moduleTemplate)({
+            isTypeScript,
+            elementClasses: elementTemplates.map((templateGroup) => templateGroup.class).join('\n'),
+            elementProperties: elementTemplates.map((templateGroup) => templateGroup.property).filter((prop) => prop.length).join('\n'),
+            elementReferences: elementTemplates.map((templateGroup) => templateGroup.reference).filter((ref) => ref.length).join('\n'),
+            className: (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.pascal)(this.config.output.moduleClassPrefix, this.name, this.config.output.moduleClassSuffix),
+            rootReference,
+            prefix: this.config.output.prefix,
+            suffix: this.config.output.suffix,
+            autoGeneratedDisclaimer: _const__WEBPACK_IMPORTED_MODULE_7__.AUTO_GENERATED_DISCLAIMER
+        });
+    }
+    setImportExport() {
+        const relativePath = node_path__WEBPACK_IMPORTED_MODULE_5___default().relative(this.config.output.path, this.output);
+        const pathWithoutExt = relativePath.split('.').slice(0, -1).join('.');
+        const fullPath = pathWithoutExt.startsWith('.') ? pathWithoutExt : `./${pathWithoutExt}`;
+        this.importExport = (0,_templates_importExport__WEBPACK_IMPORTED_MODULE_6__.importExportTemplate)(fullPath);
+    }
+    async writeModule() {
+        const filePath = node_path__WEBPACK_IMPORTED_MODULE_5___default().dirname(this.output);
+        if (!this.module.length) {
+            return;
+        }
+        if (!fs__WEBPACK_IMPORTED_MODULE_4___default().existsSync(filePath)) {
+            await fs__WEBPACK_IMPORTED_MODULE_4___default().promises.mkdir(filePath, {
+                recursive: true
+            });
+        }
+        await fs__WEBPACK_IMPORTED_MODULE_4___default().promises.writeFile(this.output, this.module, {
+            flag: 'w'
+        });
+    }
+    async init() { }
+}
+
+
+}),
+"./src/generator/classes/DistBlock.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  DistBlock: function() { return DistBlock; }
+});
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! node:path */ "node:path");
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */var _Element__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Element */ "./src/generator/classes/Element.ts");
+/* harmony import */var _Block__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Block */ "./src/generator/classes/Block.ts");
+
+
+
+class DistBlock extends _Block__WEBPACK_IMPORTED_MODULE_2__.Block {
+    constructor({ config, name, elementStrings, allModifiers }) {
+        super(config, allModifiers, name);
+        const absolutePath = node_path__WEBPACK_IMPORTED_MODULE_0___default().resolve(this.config.output.path, config.output.filename(this.name, config.output.language));
+        this.output = node_path__WEBPACK_IMPORTED_MODULE_0___default().relative(process.cwd(), absolutePath);
+        this.setImportExport();
+        this.getElements(elementStrings, allModifiers);
+        this.generateModule();
+    }
+    getElements(elementStrings, allModifiers) {
+        this.elements = ['root', ...elementStrings]
+            .map((elementString) => new _Element__WEBPACK_IMPORTED_MODULE_1__.Element({
+            config: this.config,
+            name: elementString.split(this.config.input.separators.element)[0],
+            blockName: this.name,
+            allModifiers
+        }));
+    }
+}
+
+
+}),
+"./src/generator/classes/Element.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  Element: function() { return Element; }
+});
+/* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../helpers */ "./src/helpers.ts");
+/* harmony import */var _templates_modifier__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../templates/modifier */ "./src/generator/templates/modifier.ts");
+/* harmony import */var _templates_elementClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../templates/elementClass */ "./src/generator/templates/elementClass.ts");
+/* harmony import */var _templates_elementReference__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../templates/elementReference */ "./src/generator/templates/elementReference.ts");
+/* harmony import */var _templates_elementProperty__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../templates/elementProperty */ "./src/generator/templates/elementProperty.ts");
+/* harmony import */var _messages__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../messages */ "./src/generator/messages.ts");
+
+
+
+
+
+
+class Element {
+    constructor({ config, name, blockName, allModifiers, context }) {
+        this.props = {
+            type: 'HTMLElement'
+        };
+        this.matchers = {
+            elementProps: (block, element) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}${element}.*\\()[^)]*`, 'g')
+        };
+        this.validateName(name);
+        this.name = name;
+        if ((name.match(/^\d/) || []).length) {
+            console.warn(_messages__WEBPACK_IMPORTED_MODULE_5__["default"].elementNumeric(blockName, name));
+            this.escapedName = `_${name}`;
+        }
+        else {
+            this.escapedName = name;
+        }
+        this.config = config;
+        this.selector = name === 'root' ? blockName : `${blockName}${config.input.separators.element}${name}`;
+        const rawModifiers = (0,_helpers__WEBPACK_IMPORTED_MODULE_0__.unique)(allModifiers.filter((modifier) => modifier.startsWith(`${this.selector}${config.input.separators.modifier}`)));
+        this.modifiers = rawModifiers.map((rawModifier) => {
+            var _a;
+            const modifier = (_a = rawModifier.split(config.input.separators.modifier).pop()) !== null && _a !== void 0 ? _a : '';
+            if ((modifier.match(/^\d/) || []).length) {
+                console.warn(_messages__WEBPACK_IMPORTED_MODULE_5__["default"].modifierNumeric(this.selector, modifier));
                 return {
-                    success: true,
-                    contents: result.value.toString()
+                    name: modifier,
+                    escaped: true
                 };
             }
             return {
-                success: false,
-                contents: ''
+                name: modifier,
+                escaped: false
             };
         });
+        if (context) {
+            this.getProps(context, blockName);
+        }
     }
-    async getBuiltContent() {
-        const filePaths = await (0,glob__WEBPACK_IMPORTED_MODULE_1__.glob)(`${this.distPath}/**/*.css`);
-        const fileContents = await this.getFileContents(filePaths);
-        return fileContents.map((fileContents) => fileContents.contents).join(' ');
+    validateName(name) {
     }
-    getPath(block, outputPath = this.outputPath) {
-        const absolutePath = node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(outputPath, this.config.output.filename(block, this.config.output.language));
-        return node_path__WEBPACK_IMPORTED_MODULE_10__.relative(process.cwd(), absolutePath);
-    }
-    async getPlusBlocks(dist) {
-        const filePaths = await (0,glob__WEBPACK_IMPORTED_MODULE_1__.glob)(this.config.input.include, {
-            ignore: this.config.input.exclude
-        });
-        const fileNames = filePaths.map((filePath) => {
-            const fileName = node_path__WEBPACK_IMPORTED_MODULE_10__.parse(filePath).name;
-            return fileName.startsWith('_') ? fileName.substring(1) : fileName;
-        });
-        const filePathsThatNeedContent = filePaths.filter((filePath, k) => dist.includes(`.${fileNames[k]}`));
-        const blockContentPromises = filePathsThatNeedContent.map((filePath) => fs__WEBPACK_IMPORTED_MODULE_0___default().promises.readFile(filePath));
-        const blockContents = await Promise.all(blockContentPromises)
-            .then((contents) => contents.map((c) => c.toString()));
-        const resolvedBlocks = filePathsThatNeedContent.map((filePath, k) => {
-            const fileName = node_path__WEBPACK_IMPORTED_MODULE_10__.parse(filePath).name;
-            const block = fileName.startsWith('_') ? fileName.substring(1) : fileName;
-            return {
-                name: block,
-                input: this.matchers.scss.removeComments(blockContents[k]),
-                output: this.getPath(block, this.config.output.mode === _types__WEBPACK_IMPORTED_MODULE_11__.EOutputMode.relative ? node_path__WEBPACK_IMPORTED_MODULE_10__.dirname(filePath) : this.outputPath)
-            };
-        });
-        return resolvedBlocks.filter((block) => !this.config.input.excludeBlocks.includes(block.name));
-    }
-    getElementProps(block, element) {
-        const match = block.input.match(this.matchers.scss.elementProps(block.name, element));
+    getProps(context, blockName) {
+        const match = context.match(this.matchers.elementProps(blockName, this.name));
         const props = {};
         if (match === null || match === void 0 ? void 0 : match.length) {
             const propStrings = match[0].substring(1).split(/,[ \t]*\$/g);
@@ -452,214 +1440,306 @@ class BemPlusClassGenerator {
                 props[keyValue[0].trim()] = keyValue[1].trim();
             });
         }
-        return props;
+        this.props = {
+            ...this.props,
+            ...props
+        };
     }
-    verifyFileIsBlock(block) {
-        const oneElementMatch = block.input.match(this.matchers.scss.hasAnElement(block.name));
-        const hasIndexMatch = block.input.match(this.matchers.scss.hasIndex(block.name));
-        return (oneElementMatch === null || oneElementMatch === void 0 ? void 0 : oneElementMatch.length) && (hasIndexMatch === null || hasIndexMatch === void 0 ? void 0 : hasIndexMatch.length);
-    }
-    async createIndex({ blocks, elements, modifiers }) {
-        const index = {};
-        blocks.forEach((block) => {
-            var _a;
-            const rootModifiers = (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.unique)(modifiers.filter((modifier) => modifier.startsWith(`${block.name}${this.config.input.separators.modifier}`)));
-            const rootModifierNames = rootModifiers.map((modifier) => {
-                return modifier.split(this.config.input.separators.modifier).pop();
-            });
-            const rootProps = this.getElementProps(block, 'root');
-            const rootType = (_a = rootProps.type) !== null && _a !== void 0 ? _a : 'HTMLElement';
-            if (!this.verifyFileIsBlock(block) && this.config.strategy === _types__WEBPACK_IMPORTED_MODULE_11__.EStrategy.plus) {
-                return;
-            }
-            index[block.name] = {
-                ...block,
-                elements: {
-                    root: {
-                        name: 'root',
-                        type: rootType,
-                        modifiers: rootModifierNames
-                    }
-                }
-            };
-            const elementsOfThisBlock = (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.unique)(elements.filter((element) => element.startsWith(block.name)));
-            elementsOfThisBlock.forEach((element) => {
-                var _a;
-                const elementName = element.split(this.config.input.separators.element).pop();
-                const modifiersOfThisElement = (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.unique)(modifiers.filter((modifier) => modifier.startsWith(element)));
-                const modifierNames = modifiersOfThisElement.map((modifier) => {
-                    return modifier.split(this.config.input.separators.modifier).pop();
-                });
-                const elementProps = this.getElementProps(block, elementName);
-                const elementType = (_a = elementProps.type) !== null && _a !== void 0 ? _a : 'HTMLElement';
-                index[block.name].elements[elementName] = {
-                    name: elementName,
-                    type: elementType,
-                    modifiers: modifierNames
-                };
-            });
-            const isTypeScript = this.config.output.language === _types__WEBPACK_IMPORTED_MODULE_11__.EOutputLanguage.ts;
-            const rootReference = (0,_templates_rootReference__WEBPACK_IMPORTED_MODULE_7__.rootReferenceTemplate)({
+    generateTemplates(block, isTypeScript) {
+        const modifierProperties = this.modifiers.map((modifier) => {
+            return (0,_templates_modifier__WEBPACK_IMPORTED_MODULE_1__.modifierTemplate)({
+                block,
+                element: this.name === 'root' ? '' : this.name,
+                modifier: modifier.name,
+                escaped: modifier.escaped,
                 isTypeScript,
-                className: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.pascal)(block.name)
-            });
-            index[block.name].contents = (0,_templates_module__WEBPACK_IMPORTED_MODULE_3__.moduleTemplate)({
-                isTypeScript,
-                ...this.generateElementTemplateStrings(block.name, Object.values(index[block.name].elements), isTypeScript),
-                className: (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.pascal)(this.config.output.moduleClassPrefix, block.name, this.config.output.moduleClassSuffix),
-                rootReference,
-                prefix: this.config.output.prefix,
-                suffix: this.config.output.suffix,
-                autoGeneratedDisclaimer: AUTO_GENERATED_DISCLAIMER
+                separators: this.config.input.separators
             });
         });
-        return index;
-    }
-    generateElementTemplateStrings(block, elements, isTypeScript) {
-        const elementClasses = [];
-        const elementReferences = [];
-        const elementProperties = [];
-        Object.values(elements).forEach((element) => {
-            const modifierProperties = element.modifiers.map((modifier) => {
-                return (0,_templates_modifier__WEBPACK_IMPORTED_MODULE_5__.modifierTemplate)({
-                    block,
-                    element: element.name === 'root' ? '' : element.name,
-                    modifier,
-                    isTypeScript,
-                    separators: this.config.input.separators
-                });
-            });
-            const className = (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.pascal)(this.config.output.elementClassPrefix, block, element.name, this.config.output.elementClassSuffix);
-            const elementClass = (0,_templates_elementClass__WEBPACK_IMPORTED_MODULE_4__.elementClassTemplate)({
-                isTypeScript,
-                className,
-                type: element.type,
-                modifiers: modifierProperties.join('')
-            });
-            elementClasses.push(elementClass);
-            if (element.name === 'root') {
-                return;
-            }
-            const elementReference = (0,_templates_elementReference__WEBPACK_IMPORTED_MODULE_6__.elementReferenceTemplate)({
+        const className = (0,_helpers__WEBPACK_IMPORTED_MODULE_0__.pascal)(this.config.output.elementClassPrefix, block, this.name, this.config.output.elementClassSuffix);
+        const elementClass = (0,_templates_elementClass__WEBPACK_IMPORTED_MODULE_2__.elementClassTemplate)({
+            isTypeScript,
+            className,
+            type: this.props.type,
+            modifiers: modifierProperties.join('')
+        });
+        return {
+            class: elementClass,
+            reference: this.name === 'root' ? '' : (0,_templates_elementReference__WEBPACK_IMPORTED_MODULE_3__.elementReferenceTemplate)({
                 isTypeScript,
                 className,
                 block,
-                element,
+                element: this,
                 separators: this.config.input.separators
-            });
-            elementReferences.push(elementReference);
-            const elementProperty = (0,_templates_elementProperty__WEBPACK_IMPORTED_MODULE_8__.elementPropertyTemplate)({
+            }),
+            property: this.name === 'root' ? '' : (0,_templates_elementProperty__WEBPACK_IMPORTED_MODULE_4__.elementPropertyTemplate)({
                 isTypeScript,
                 className,
-                element: element.name
-            });
-            elementProperties.push(elementProperty);
-        });
-        return {
-            elementClasses: elementClasses.join('\n'),
-            elementReferences: elementReferences.join('\n'),
-            elementProperties: elementProperties.join('\n')
+                element: this.escapedName
+            })
         };
     }
-    async writeModules() {
-        await fs__WEBPACK_IMPORTED_MODULE_0___default().promises.mkdir(this.outputPath, {
-            recursive: true
-        });
-        if (this.config.strategy === _types__WEBPACK_IMPORTED_MODULE_11__.EStrategy.dist && this.config.output.mode === _types__WEBPACK_IMPORTED_MODULE_11__.EOutputMode.relative) {
-            console.warn(`bem-plus: Relative output mode is not supported for "dist" strategy. Your files will be generated here: ${this.config.output.path}`);
-        }
-        const mkdirPaths = Object.values(this.index)
-            .filter((block) => block.output.includes('/'))
-            .map((block) => node_path__WEBPACK_IMPORTED_MODULE_10__.relative(process.cwd(), node_path__WEBPACK_IMPORTED_MODULE_10__.dirname(block.output)));
-        const mkdirPromises = (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.unique)(mkdirPaths).map((mkdirPath) => {
-            return fs__WEBPACK_IMPORTED_MODULE_0___default().promises.mkdir(mkdirPath, {
-                recursive: true
-            });
-        });
-        await Promise.all(mkdirPromises);
-        const writeFilePromises = Object.values(this.index).map((block) => {
-            var _a;
-            return fs__WEBPACK_IMPORTED_MODULE_0___default().promises.writeFile(block.output, (_a = block.contents) !== null && _a !== void 0 ? _a : '', {
-                flag: 'w'
-            }).then(() => {
-                console.log(`Generated ${block.output}`);
-            });
-        });
-        await Promise.all(writeFilePromises);
+}
+
+
+}),
+"./src/generator/classes/PlusBlock.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  PlusBlock: function() { return PlusBlock; }
+});
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! node:path */ "node:path");
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */var _types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../types */ "./src/generator/types.ts");
+/* harmony import */var _Element__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Element */ "./src/generator/classes/Element.ts");
+/* harmony import */var _Block__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Block */ "./src/generator/classes/Block.ts");
+
+
+
+
+
+class PlusBlock extends _Block__WEBPACK_IMPORTED_MODULE_4__.Block {
+    constructor({ config, inputPath, allModifiers }) {
+        super(config, allModifiers);
+        this.input = '';
+        this.matchers = {
+            removeComments: (input) => input.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, ''),
+            element: (block) => new RegExp(`(?<=&${this.config.input.separators.element})[^ {(]*(?=.*\\n.*@include ${block}${this.config.input.separators.mixinElement})`, 'g'),
+            hasIndex: (block) => new RegExp(`@mixin ${block}([ \\t(]*[({]|[\\s\\S]).*[\\s\\S].*\\.${block}`),
+            hasAnElement: (block) => new RegExp(`@mixin ${block}${this.config.input.separators.mixinElement}.*`)
+        };
+        this.inputPath = inputPath;
+        const fileName = node_path__WEBPACK_IMPORTED_MODULE_0___default().parse(inputPath).name;
+        this.name = fileName.startsWith('_') ? fileName.substring(1) : fileName;
+        const absolutePath = node_path__WEBPACK_IMPORTED_MODULE_0___default().resolve(config.output.mode === _types__WEBPACK_IMPORTED_MODULE_2__.EOutputMode.relative ? node_path__WEBPACK_IMPORTED_MODULE_0___default().dirname(inputPath) : this.config.output.path, config.output.filename(this.name, config.output.language));
+        this.output = node_path__WEBPACK_IMPORTED_MODULE_0___default().relative(process.cwd(), absolutePath);
+        this.setImportExport();
     }
-    async clearObsoleteModules() {
-        const otherExt = this.config.output.language === _types__WEBPACK_IMPORTED_MODULE_11__.EOutputLanguage.ts ? _types__WEBPACK_IMPORTED_MODULE_11__.EOutputLanguage.js : _types__WEBPACK_IMPORTED_MODULE_11__.EOutputLanguage.ts;
-        let index = await this.getFileContents([node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(this.config.output.path, `index.${this.config.output.language}`)]);
-        if (!index[0].success) {
-            index = await this.getFileContents([node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(this.config.output.path, `index.${otherExt}`)]);
-            if (!index[0].success) {
-                return;
-            }
-        }
-        const oldModulePaths = (index[0].contents.match(/(?<=export \* from ['"`]).*(?=['"`])/g) || [])
-            .map((oldRelativePath) => node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(this.config.output.path, oldRelativePath));
-        const newModulePaths = Object.values(this.index).map((block) => {
-            const parsed = node_path__WEBPACK_IMPORTED_MODULE_10__.parse(block.output);
-            return node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(node_path__WEBPACK_IMPORTED_MODULE_10__.join(parsed.dir, parsed.name));
-        });
-        const obsoleteModulePaths = oldModulePaths
-            .filter((oldModulePath) => !newModulePaths.includes(oldModulePath))
-            .map((oldModulePath) => node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(this.config.output.path, oldModulePath));
-        const obsoleteModulePathsWithCurrentExt = obsoleteModulePaths.map((obsoleteModulePath) => `${obsoleteModulePath}.${this.config.output.language}`);
-        const fileContentsWithCurrentExt = await this.getFileContents(obsoleteModulePathsWithCurrentExt);
-        const confirmedModules = [];
-        const retryWithOldExt = [];
-        fileContentsWithCurrentExt.forEach((fileContent, key) => {
-            if (!fileContent.success) {
-                retryWithOldExt.push(obsoleteModulePaths[key]);
-            }
-            else if (fileContent.contents.includes(AUTO_GENERATED_DISCLAIMER)) {
-                confirmedModules.push(obsoleteModulePathsWithCurrentExt[key]);
-            }
-        });
-        if (retryWithOldExt.length) {
-            const obsoleteModulePathsWithOldExt = retryWithOldExt.map((obsoleteModulePath) => `${obsoleteModulePath}.${otherExt}`);
-            const fileContentsWithOldExt = await this.getFileContents(obsoleteModulePathsWithOldExt);
-            fileContentsWithOldExt.forEach((fileContent, key) => {
-                if (fileContent.success && fileContent.contents.includes(AUTO_GENERATED_DISCLAIMER)) {
-                    confirmedModules.push(obsoleteModulePathsWithCurrentExt[key]);
-                }
-            });
-        }
-        const unlinkPromises = confirmedModules.map((obsoleteModule) => {
-            const fullPath = node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(this.config.output.path, obsoleteModule);
-            return fs__WEBPACK_IMPORTED_MODULE_0___default().promises.unlink(fullPath);
-        });
-        await Promise.all(unlinkPromises);
-        (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.unique)(confirmedModules.map((module) => node_path__WEBPACK_IMPORTED_MODULE_10__.dirname(module))).forEach((dir) => {
-            this.recursivelyDeleteEmptyDir(dir);
-        });
-    }
-    recursivelyDeleteEmptyDir(dir) {
-        const isEmpty = fs__WEBPACK_IMPORTED_MODULE_0___default().readdirSync(dir).length === 0;
-        if (isEmpty) {
-            fs__WEBPACK_IMPORTED_MODULE_0___default().rmdirSync(dir);
-            this.recursivelyDeleteEmptyDir(node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(dir, '..'));
+    async init() {
+        const buffer = await fs__WEBPACK_IMPORTED_MODULE_1___default().promises.readFile(this.inputPath).then((buffer) => buffer.toString());
+        this.input = this.matchers.removeComments(buffer.toString());
+        if (this.verifyFileIsBlock()) {
+            this.getElements();
+            this.generateModule();
         }
     }
-    async createBarrel() {
-        const imports = {};
-        Object.entries(this.index).forEach(([indexKey, indexValue]) => {
-            const relativePath = node_path__WEBPACK_IMPORTED_MODULE_10__.relative(this.config.output.path, indexValue.output);
-            const pathWithoutExt = relativePath.split('.').slice(0, -1).join('.');
-            const fullPath = pathWithoutExt.startsWith('.') ? pathWithoutExt : `./${pathWithoutExt}`;
-            imports[(0,_helpers__WEBPACK_IMPORTED_MODULE_2__.camel)(indexKey)] = (0,_templates_importExport__WEBPACK_IMPORTED_MODULE_9__.importExportTemplate)(fullPath);
-        });
-        const autoGeneratedDisclaimerString = `/* ${AUTO_GENERATED_DISCLAIMER} */`;
-        const importsString = Object.values(imports).join('\n');
-        const fullIndex = `${autoGeneratedDisclaimerString}\n\n${importsString}`;
-        const fileName = `index.${this.config.output.language}`;
-        const filePath = node_path__WEBPACK_IMPORTED_MODULE_10__.resolve(this.config.output.path, fileName);
-        await fs__WEBPACK_IMPORTED_MODULE_0___default().promises.writeFile(filePath, fullIndex, {
-            flag: 'w'
-        });
+    getElements() {
+        var _a;
+        const matches = ['root', ...((_a = this.input) === null || _a === void 0 ? void 0 : _a.match(this.matchers.element(this.name))) || []];
+        this.elements = (matches || []).map((match) => new _Element__WEBPACK_IMPORTED_MODULE_3__.Element({
+            config: this.config,
+            name: match.trim(),
+            blockName: this.name,
+            allModifiers: this.allModifiers,
+            context: this.input
+        }));
+    }
+    verifyFileIsBlock() {
+        const oneElementMatch = this.input.match(this.matchers.hasAnElement(this.name));
+        const hasIndexMatch = this.input.match(this.matchers.hasIndex(this.name));
+        return (oneElementMatch === null || oneElementMatch === void 0 ? void 0 : oneElementMatch.length) && (hasIndexMatch === null || hasIndexMatch === void 0 ? void 0 : hasIndexMatch.length);
     }
 }
+
+
+}),
+"./src/generator/const.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  AUTO_GENERATED_DISCLAIMER: function() { return AUTO_GENERATED_DISCLAIMER; },
+  PACKAGE_NAME: function() { return PACKAGE_NAME; },
+  RESERVED_NAMES: function() { return RESERVED_NAMES; }
+});
+const PACKAGE_NAME = '@bem-plus/class-generator';
+const AUTO_GENERATED_DISCLAIMER = 'This file was automatically generated by the bem-plus package.';
+const RESERVED_NAMES = ['apply', 'bind', 'call', 'constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toString', 'toLocaleString', 'valueOf', 'prototype', 'length'];
+
+
+}),
+"./src/generator/errors.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  InvalidSeparatorError: function() { return InvalidSeparatorError; },
+  NumericIdentifierError: function() { return NumericIdentifierError; },
+  SameSeparatorError: function() { return SameSeparatorError; }
+});
+/* harmony import */var _const__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./const */ "./src/generator/const.ts");
+
+class SameSeparatorError extends Error {
+    constructor() {
+        super(`${_const__WEBPACK_IMPORTED_MODULE_0__.PACKAGE_NAME}: Cannot use the same separator for elements and modifiers`);
+        this.name = 'SameSeparatorError';
+    }
+}
+class InvalidSeparatorError extends Error {
+    constructor(separator, separatorType) {
+        super(`${_const__WEBPACK_IMPORTED_MODULE_0__.PACKAGE_NAME}: ${separator.length ? `${separatorType} cannot be separated by "${separator}".` : `${separatorType} must be separated by at least one character.`}`);
+        this.name = 'InvalidSeparatorError';
+    }
+}
+class NumericIdentifierError extends Error {
+    constructor() {
+        super(`${_const__WEBPACK_IMPORTED_MODULE_0__.PACKAGE_NAME}: Block, element and modifier names cannot start with a number. .h1 is okay, .1st-heading or .heading--1 is not.`);
+        this.name = 'NumericIdentifierError';
+    }
+}
+
+
+}),
+"./src/generator/generator.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  BemPlusClassGenerator: function() { return BemPlusClassGenerator; }
+});
+/* harmony import */var glob__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! glob */ "./node_modules/glob/dist/esm/index.js");
+/* harmony import */var _types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./types */ "./src/generator/types.ts");
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! node:path */ "node:path");
+/* harmony import */var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */var _classes_PlusBlock__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./classes/PlusBlock */ "./src/generator/classes/PlusBlock.ts");
+/* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../helpers */ "./src/helpers.ts");
+/* harmony import */var _classes_DistBlock__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./classes/DistBlock */ "./src/generator/classes/DistBlock.ts");
+/* harmony import */var _classes_Barrel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./classes/Barrel */ "./src/generator/classes/Barrel.ts");
+/* harmony import */var _getFileContents__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./getFileContents */ "./src/generator/getFileContents.ts");
+/* harmony import */var _errors__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./errors */ "./src/generator/errors.ts");
+
+
+
+
+
+
+
+
+
+class BemPlusClassGenerator {
+    constructor(config, distPath) {
+        this.config = config;
+        this.distPath = distPath;
+        this.dist = '';
+        this.blocks = [];
+        this.allModifiers = [];
+        this.matchers = {
+            bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
+            blockElement: new RegExp(`[^(\\d.\\n]*${this.config.input.separators.element}.+?(?=${this.config.input.separators.modifier}|[ .,[:#{)>+])`, 'g'),
+            blockElementModifier: new RegExp(`(?<!(var\\(|{|;))[^(.\\n!{]*${this.config.input.separators.modifier}[^ .,[:#{)>+]*`, 'g')
+        };
+        this.validateSeparators();
+    }
+    async generate() {
+        this.dist = await this.getBuiltContent();
+        this.allModifiers = this.dist.match(this.matchers.blockElementModifier) || [];
+        this.blocks = this.config.strategy === _types__WEBPACK_IMPORTED_MODULE_1__.EStrategy.plus ? await this.getPlusBlocks() : this.getDistBlocks();
+        await this.initBlocks();
+        await this.writeModules();
+        const barrel = new _classes_Barrel__WEBPACK_IMPORTED_MODULE_6__.Barrel(this.config, this.blocks);
+        await barrel.clearObsoleteModules();
+        await barrel.write();
+        this.config.output.onComplete();
+    }
+    async initBlocks() {
+        const initPromises = this.blocks.map((block) => block.init());
+        await Promise.all(initPromises);
+    }
+    async writeModules() {
+        const writePromises = this.blocks.map((block) => block.writeModule());
+        await Promise.all(writePromises);
+    }
+    async getPlusBlocks() {
+        const filePaths = await (0,glob__WEBPACK_IMPORTED_MODULE_0__.glob)(this.config.input.include, {
+            ignore: this.config.input.exclude
+        });
+        const fileNames = filePaths.map((filePath) => {
+            const fileName = node_path__WEBPACK_IMPORTED_MODULE_2___default().parse(filePath).name;
+            return fileName.startsWith('_') ? fileName.substring(1) : fileName;
+        });
+        const filePathsThatNeedContent = filePaths.filter((filePath, k) => this.dist.includes(`.${fileNames[k]}`));
+        return filePathsThatNeedContent.map((filePath) => new _classes_PlusBlock__WEBPACK_IMPORTED_MODULE_3__.PlusBlock({
+            config: this.config,
+            inputPath: filePath,
+            allModifiers: this.allModifiers
+        }));
+    }
+    getDistBlocks() {
+        const elements = this.dist.match(this.matchers.blockElement) || [];
+        const blocksFromElements = elements.map((element) => element.split(this.config.input.separators.element)[0]);
+        const blocksFromModifiers = this.allModifiers.map((modifier) => modifier.split(this.matchers.bemSeparator)[0]);
+        return (0,_helpers__WEBPACK_IMPORTED_MODULE_4__.unique)([...blocksFromElements, ...blocksFromModifiers])
+            .filter((block) => !this.config.input.excludeBlocks.includes(block))
+            .map((name) => new _classes_DistBlock__WEBPACK_IMPORTED_MODULE_5__.DistBlock({
+            config: this.config,
+            name,
+            elementStrings: elements,
+            allModifiers: this.allModifiers
+        }));
+    }
+    validateSeparators() {
+        if (this.config.input.separators.modifier === this.config.input.separators.element) {
+            throw new _errors__WEBPACK_IMPORTED_MODULE_8__.SameSeparatorError();
+        }
+        if (['-', ''].includes(this.config.input.separators.modifier)) {
+            throw new _errors__WEBPACK_IMPORTED_MODULE_8__.InvalidSeparatorError(this.config.input.separators.modifier, 'The modifier portion of a BEM selector');
+        }
+        if (['-', ''].includes(this.config.input.separators.element)) {
+            throw new _errors__WEBPACK_IMPORTED_MODULE_8__.InvalidSeparatorError(this.config.input.separators.element, 'The element portion of a BEM selector');
+        }
+        if ([''].includes(this.config.input.separators.mixinElement)) {
+            throw new _errors__WEBPACK_IMPORTED_MODULE_8__.InvalidSeparatorError(this.config.input.separators.mixinElement, 'The element portion of a mixin name');
+        }
+    }
+    async getBuiltContent() {
+        const filePaths = await (0,glob__WEBPACK_IMPORTED_MODULE_0__.glob)(`${this.distPath}/**/*.css`);
+        const fileContents = await (0,_getFileContents__WEBPACK_IMPORTED_MODULE_7__.getFileContents)(filePaths);
+        return fileContents.map((fileContents) => fileContents.contents).join(' ');
+    }
+}
+
+
+}),
+"./src/generator/getFileContents.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  getFileContents: function() { return getFileContents; }
+});
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_0__);
+
+const getFileContents = async (paths) => {
+    const filePromises = paths.map((filePath) => fs__WEBPACK_IMPORTED_MODULE_0___default().promises.readFile(filePath));
+    const settled = await Promise.allSettled(filePromises);
+    return settled.map((result) => {
+        if (result.status === 'fulfilled') {
+            return {
+                success: true,
+                contents: result.value.toString()
+            };
+        }
+        return {
+            success: false,
+            contents: ''
+        };
+    });
+};
+
+
+}),
+"./src/generator/messages.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */var _const__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./const */ "./src/generator/const.ts");
+/* harmony import */var colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! colors */ "./node_modules/colors/lib/index.js");
+/* harmony import */var colors__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(colors__WEBPACK_IMPORTED_MODULE_1__);
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    elementNumeric: (block, element) => colors__WEBPACK_IMPORTED_MODULE_1___default().yellow(`${_const__WEBPACK_IMPORTED_MODULE_0__.PACKAGE_NAME}: Element "${element}" of block "${block}" starts with a number. This is valid CSS but it does not result in a valid JS property name. Because of this, element "${element} will be prefixed with "_": "_${element}".`),
+    modifierNumeric: (selector, modifier) => colors__WEBPACK_IMPORTED_MODULE_1___default().yellow(`${_const__WEBPACK_IMPORTED_MODULE_0__.PACKAGE_NAME}: Modifier "${modifier}" of selector "${selector}" starts with a number. This is valid CSS but it does not result in valid JS getters and setters. Because of this, modifier "${modifier}" will be prefixed with "_": "_${modifier}".`)
+});
 
 
 }),
@@ -767,7 +1847,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 /* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../helpers */ "./src/helpers.ts");
 
-const elementReferenceTemplate = ({ isTypeScript, className, block, element, separators }) => `this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.name)} = [...this.root.el.querySelectorAll${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el));`;
+const elementReferenceTemplate = ({ isTypeScript, className, block, element, separators }) => `this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = [...this.root.el.querySelectorAll${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el));`;
 
 
 }),
@@ -789,12 +1869,12 @@ __webpack_require__.d(__webpack_exports__, {
 });
 /* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../helpers */ "./src/helpers.ts");
 
-const modifierTemplate = ({ block, element, modifier, isTypeScript, separators }) => `
-get ${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(modifier)}() {
+const modifierTemplate = ({ block, element, modifier, escaped, isTypeScript, separators }) => `
+get ${escaped ? '_' : ''}${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(modifier)}() {
     return this.el.classList.contains('${block}${element.length ? `${separators.element}${element}` : ''}${separators.modifier}${modifier}');
 }
 
-set ${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(modifier)}(value${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.colonType)('boolean', isTypeScript)}) {
+set ${escaped ? '_' : ''}${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(modifier)}(value${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.colonType)('boolean', isTypeScript)}) {
     this.el.classList.toggle('${block}${element.length ? `${separators.element}${element}` : ''}${separators.modifier}${modifier}', value);
 }
 `;
@@ -813,7 +1893,7 @@ const moduleTemplate = ({ isTypeScript, className, elementProperties, elementCla
 
 ${prefix}
 
-import { BemPlusModule } from '@bem-plus/classgenerator/module';
+import { BemPlusModule } from '@bem-plus/class-generator/module';
 ${elementClasses}
 export class ${className} extends BemPlusModule {
     root;
@@ -859,7 +1939,6 @@ var EOutputMode;
 (function (EOutputMode) {
     EOutputMode["absolute"] = "absolute";
     EOutputMode["relative"] = "relative";
-    EOutputMode["node_modules"] = "node_modules";
 })(EOutputMode || (EOutputMode = {}));
 var EOutputLanguage;
 (function (EOutputLanguage) {
@@ -886,10 +1965,11 @@ __webpack_require__.d(__webpack_exports__, {
   unique: function() { return unique; }
 });
 const camel = (str) => {
+    const addUnderlineToStart = str.startsWith('_');
     const camelOrPascal = str
         .replace(/[_-][^_\-A-Z]|(?<=[A-Z])[A-Z]/g, (m) => m.toLowerCase() === m ? m.toUpperCase() : m.toLowerCase())
         .replace(/[-_]/g, '');
-    return `${camelOrPascal.charAt(0).toLowerCase()}${camelOrPascal.slice(1)}`;
+    return `${addUnderlineToStart ? '_' : ''}${camelOrPascal.charAt(0).toLowerCase()}${camelOrPascal.slice(1)}`;
 };
 const pascal = (...strings) => {
     const camelized = camel(strings.join('-'));
@@ -949,6 +2029,16 @@ module.exports = require("node:string_decoder");
 "node:url": (function (module) {
 "use strict";
 module.exports = require("node:url");
+
+}),
+"os": (function (module) {
+"use strict";
+module.exports = require("os");
+
+}),
+"util": (function (module) {
+"use strict";
+module.exports = require("util");
 
 }),
 "./node_modules/glob/dist/esm/glob.js": (function (__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
@@ -13179,11 +14269,15 @@ return cachedModule.exports;
 }
 // Create a new module (and put it into the cache)
 var module = (__webpack_module_cache__[moduleId] = {
+id: moduleId,
+loaded: false,
 exports: {}
 });
 // Execute the module function
 __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 
+// Flag the module as loaded
+module.loaded = true;
 // Return the exports of the module
 return module.exports;
 
@@ -13261,6 +14355,14 @@ __webpack_require__.r = function(exports) {
 	Object.defineProperty(exports, '__esModule', { value: true });
 };
 
+})();
+// webpack/runtime/node_module_decorator
+(() => {
+__webpack_require__.nmd = function (module) {
+    module.paths = [];
+    if (!module.children) module.children = [];
+    return module;
+};
 })();
 /************************************************************************/
 var __webpack_exports__ = {};

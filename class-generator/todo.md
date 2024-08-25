@@ -1,6 +1,5 @@
-- Empty modifier detection
-- Publish as npm package
-- jest
+- publish as npm package
+- write tests
 - linking elements
-- support sass
-- support less
+- log level config
+- write docs

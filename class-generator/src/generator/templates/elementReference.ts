@@ -1,5 +1,6 @@
 import { angleType, camel } from '../../helpers'
-import { TElement, TSeparators } from '../types'
+import { TSeparators } from '../types'
+import { Element } from '../classes/Element'
 
 export const elementReferenceTemplate = ({
     isTypeScript,
@@ -13,6 +14,6 @@ export const elementReferenceTemplate = ({
     prefix?: string
     suffix?: string
     block: string
-    element: TElement
+    element: Element
     separators: TSeparators
-}) => `this.${camel(element.name)} = [...this.root.el.querySelectorAll${angleType(element.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el));`
+}) => `this.${camel(element.escapedName)} = [...this.root.el.querySelectorAll${angleType(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el));`
