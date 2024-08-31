@@ -9,21 +9,22 @@ You can also use this generator if you use only BEM, but not bem-plus. However, 
 
 ## Installation
 
-    npm i -D @bem-plus/class-generator
-
+```
+npm i -D @bem-plus/class-generator
+```
 ### Webpack
+```typescript
+const { BemPlusClassGeneratorPlugin } = require('@bem-plus/class-generator')
 
-    const { BemPlusClassGeneratorPlugin } = require('@bem-plus/class-generator')
-
-    module.exports = {
-        // ...
-        plugins: [
-            new BemPlusClassGeneratorPlugin({
-                // config, see below
-            })
-        ]
-    }
-
+module.exports = {
+    // ...
+    plugins: [
+        new BemPlusClassGeneratorPlugin({
+            // config, see below
+        })
+    ]
+}
+```
 ## Usage
 
 After installation and configuration, the generator works in watch and build mode. Simply write your stylesheets as you usually would and the JavaScript classes will be generated automatically.
@@ -35,7 +36,7 @@ For an example input / output, [see here](https://github.com/stefanbaumeler/bem-
 The entire config is optional. If an option is not specified, defaults will be used as specified below.
 
 Recommended config:
-
+```typescript
     new BemPlusClassGeneratorPlugin({
         strategy: 'plus',
         output: {
@@ -44,7 +45,7 @@ Recommended config:
             }
         }
     })
-
+```
 ### strategy
 
 There are two strategies for generation: `dist` (default) and `plus` (recommended). Unlike the `dist` strategy, the `plus` strategy analyzes the uncompiled Sass code in addition to the compiled CSS.
