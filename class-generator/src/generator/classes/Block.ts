@@ -1,6 +1,6 @@
 import { moduleTemplate } from '../templates/module'
 import { pascal } from '../../helpers'
-import { EOutputLanguage, EOutputMode } from '../types'
+import { EOutputLanguage } from '../types'
 import { TBemPlusClassGeneratorConfigOutput } from '../schema'
 import { rootReferenceTemplate } from '../templates/rootReference'
 import { Element } from './Element'
@@ -30,11 +30,7 @@ export class Block {
             elementClasses: elementTemplates.map((templateGroup) => templateGroup.class).join('\n'),
             elementProperties: elementTemplates.map((templateGroup) => templateGroup.property).filter((prop) => prop.length).join('\n'),
             elementReferences: elementTemplates.map((templateGroup) => templateGroup.reference).filter((ref) => ref.length).join('\n'),
-            className: pascal(
-                this.config.output.moduleClassPrefix,
-                this.name,
-                this.config.output.moduleClassSuffix
-            ),
+            className: this.config.output.moduleClass(pascal(this.name)),
             rootReference,
             prefix: this.config.output.prefix,
             suffix: this.config.output.suffix,

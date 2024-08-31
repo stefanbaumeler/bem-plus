@@ -117,12 +117,7 @@ export class Element {
             })
         })
 
-        const className = pascal(
-            this.config.output.elementClassPrefix,
-            block,
-            this.name,
-            this.config.output.elementClassSuffix
-        )
+        const className =  this.config.output.elementClass(pascal(block, this.name))
 
         const elementClass = elementClassTemplate({
             isTypeScript,
