@@ -10,7 +10,6 @@ export class BemPlusClassGeneratorPlugin {
     apply(compiler: any) {
         const callback = () => {
             const generator = new BemPlusClassGenerator(this.options, compiler.outputPath)
-
             generator.generate()
         }
 

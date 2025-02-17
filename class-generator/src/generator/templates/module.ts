@@ -35,6 +35,8 @@ export class ${className} extends BemPlusModule {
         super(${angleType('HTMLElement', isTypeScript)}rootElement)
 
         ${rootReference}
+
+        this.refresh();
     }
 
     refresh = () => {

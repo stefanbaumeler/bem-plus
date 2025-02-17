@@ -19,9 +19,15 @@ export class Barrel {
         const fileName = `index.${this.config.output.language}`
         const filePath = path.resolve(this.config.output.path, fileName)
 
-        await fs.promises.writeFile(filePath, fullIndex, {
-            flag: 'w'
-        })
+        const existing = await getFileContents([filePath])
+
+        if (existing.length) {
+            if (JSON.stringify(existing[0].contents) !== JSON.stringify(fullIndex)) {
+                await fs.promises.writeFile(filePath, fullIndex, {
+                    flag: 'w'
+                })
+            }
+        }
     }
 
     async clearObsoleteModules() {

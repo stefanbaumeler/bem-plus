@@ -1,5 +1,5 @@
 import { moduleTemplate } from '../templates/module'
-import { pascal } from '../../helpers'
+import { getFileContents, pascal } from '../../helpers'
 import { EOutputLanguage } from '../types'
 import { TBemPlusClassGeneratorConfigOutput } from '../schema'
 import { rootReferenceTemplate } from '../templates/rootReference'
@@ -58,9 +58,15 @@ export class Block {
             })
         }
 
-        await fs.promises.writeFile(this.output, this.module, {
-            flag: 'w'
-        })
+        const existing = await getFileContents([this.output])
+
+        if (existing.length) {
+            if (JSON.stringify(existing[0].contents) !== JSON.stringify(this.module)) {
+                await fs.promises.writeFile(this.output, this.module, {
+                    flag: 'w'
+                })
+            }
+        }
     }
 
     async init() {}
