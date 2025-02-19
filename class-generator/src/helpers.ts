@@ -34,7 +34,7 @@ export const indent = (content: string, indentation: number) => {
 
 export const angleType = (typeString: string, isTypeScript: boolean) => isTypeScript ? `<${typeString}>` : ''
 
-export const colonType = (typeString: string, isTypeScript: boolean) => isTypeScript ? `: ${typeString}` : ''
+export const colonType = (typeString: string, isTypeScript: boolean, optional?: boolean) => isTypeScript ? `${optional ? '?' : ''}: ${typeString}` : ''
 
 export const getFileContents = async (paths: string[]) => {
     const filePromises = paths.map((filePath) => fs.promises.readFile(filePath))

@@ -3,10 +3,12 @@ import { camel, colonType } from '../../helpers'
 export const elementPropertyTemplate = ({
     isTypeScript,
     className,
-    element
+    element,
+    single
 }: {
     isTypeScript: boolean
     className: string
     element: string
-}) => `${camel(element)}${colonType(`${className}[]`, isTypeScript)} = []\n`
+    single?: boolean
+}) => `${camel(element)}${colonType(`${className}${single ? '' : '[]'}`, isTypeScript, single)}${single ? '' : '= []'}\n`
 

@@ -25,6 +25,10 @@ export class DistBlock extends Block {
         this.generateModule()
     }
 
+    async setAutoloader() {
+        this.autoloader = `    '.${this.name}': '${this.output}'`
+    }
+
     getElements(elementStrings: string[], allModifiers: string[]) {
         this.elements = ['root', ...elementStrings]
             .map((elementString) => new Element({

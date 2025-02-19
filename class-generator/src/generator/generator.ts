@@ -9,6 +9,7 @@ import { DistBlock } from './classes/DistBlock'
 import { Barrel } from './classes/Barrel'
 import { SameSeparatorError } from './errors/SameSeparatorError'
 import { InvalidSeparatorError } from './errors/InvalidSeparatorError'
+import { Autoloader } from './classes/Autoloader'
 
 export class BemPlusClassGenerator {
     dist = ''
@@ -36,6 +37,12 @@ export class BemPlusClassGenerator {
 
         await barrel.clearObsoleteModules()
         await barrel.write()
+
+        if (this.config.output.autoloader) {
+            const autoloader = new Autoloader(this.config, this.blocks)
+
+            await autoloader.write()
+        }
 
         this.config.output.onComplete()
     }

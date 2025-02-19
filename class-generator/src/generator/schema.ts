@@ -14,6 +14,7 @@ const defaults = {
         }
     },
     output: {
+        autoloader: false,
         language: EOutputLanguage.ts,
         mode: EOutputMode.absolute,
         path: './.bem-plus',
@@ -39,6 +40,7 @@ export const BemPlusGeneratorConfig = z.object({
         }).default(defaults.input.separators)
     }).default(defaults.input),
     output: z.object({
+        autoloader: z.boolean().default(defaults.output.autoloader),
         language: z.nativeEnum(EOutputLanguage).default(defaults.output.language),
         mode: z.nativeEnum(EOutputMode).default(defaults.output.mode),
         path: z.string().default(defaults.output.path),

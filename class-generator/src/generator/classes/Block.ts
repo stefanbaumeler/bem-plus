@@ -14,6 +14,7 @@ export class Block {
     output = ''
     module = ''
     importExport = ''
+    autoloader = ''
     constructor(public config: TBemPlusClassGeneratorConfigOutput, public allModifiers: string[], public name = '') {}
 
     generateModule() {
@@ -45,7 +46,13 @@ export class Block {
         this.importExport = importExportTemplate(fullPath)
     }
 
+    async setAutoloader() {
+
+    }
+
     async writeModule() {
+        await this.setAutoloader()
+
         const filePath = path.dirname(this.output)
 
         if (!this.module.length) {

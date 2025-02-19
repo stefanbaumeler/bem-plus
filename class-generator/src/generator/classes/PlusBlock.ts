@@ -4,6 +4,7 @@ import { EOutputMode } from '../types'
 import { TBemPlusClassGeneratorConfigOutput } from '../schema'
 import { Element } from './Element'
 import { Block } from './Block'
+import { getFileContents } from '../../helpers'
 
 export class PlusBlock extends Block {
     input = ''
@@ -36,6 +37,13 @@ export class PlusBlock extends Block {
 
         this.output = path.relative(process.cwd(), absolutePath)
         this.setImportExport()
+    }
+
+    async setAutoloader() {
+        const modulePath = path.relative(process.cwd(), path.resolve(`${path.dirname(this.inputPath)}/${path.parse(this.inputPath).name}.${this.config.output.language}`))
+        const existing = await getFileContents([modulePath])
+
+        this.autoloader = `    '.${this.name}': '${existing.length ? modulePath : this.output}'`
     }
 
     async init() {

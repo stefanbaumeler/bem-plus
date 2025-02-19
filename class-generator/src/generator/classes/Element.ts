@@ -138,7 +138,8 @@ export class Element {
             property: this.name === 'root' ? '' : elementPropertyTemplate({
                 isTypeScript,
                 className,
-                element: this.escapedName
+                element: this.escapedName,
+                single: JSON.parse(this.props.single ?? 'false')
             })
         }
     }
