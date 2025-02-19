@@ -14472,8 +14472,7 @@ class BemPlusClassGeneratorPlugin {
             const generator = new _generator_generator__WEBPACK_IMPORTED_MODULE_1__.BemPlusClassGenerator(this.options, compiler.outputPath);
             generator.generate();
         };
-        // compiler.hooks.done.tap('BEMPlus Class Generator Plugin', callback)
-        compiler.hooks.afterEmit.tap('BEMPlus Class Generator Plugin', callback);
+        compiler.hooks.additionalPass.tap('@bem-plus/class-generator plugin', callback);
     }
 }
 

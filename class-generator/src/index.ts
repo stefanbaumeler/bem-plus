@@ -13,7 +13,6 @@ export class BemPlusClassGeneratorPlugin {
             generator.generate()
         }
 
-        // compiler.hooks.done.tap('BEMPlus Class Generator Plugin', callback)
-        compiler.hooks.afterEmit.tap('BEMPlus Class Generator Plugin', callback)
+        compiler.hooks.additionalPass.tap('@bem-plus/class-generator plugin', callback)
     }
 }
