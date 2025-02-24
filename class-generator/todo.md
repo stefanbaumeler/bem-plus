@@ -1,5 +1,0 @@
-- publish as npm package
-- write tests
-- linking elements
-- log level config
-- write docs

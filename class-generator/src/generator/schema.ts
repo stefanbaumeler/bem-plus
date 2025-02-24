@@ -4,7 +4,7 @@ import { EOutputLanguage, EOutputMode, EStrategy } from './types'
 const defaults = {
     strategy: EStrategy.dist,
     input: {
-        include: ['**/*.scss', '**/*.sass'],
+        include: ['**/*.{scss,sass}'],
         exclude: ['node_modules/**'],
         excludeBlocks: [],
         separators: {
@@ -27,7 +27,7 @@ const defaults = {
     }
 }
 
-export const BemPlusGeneratorConfig = z.object({
+export const BemPlusClassGeneratorConfig = z.object({
     strategy: z.nativeEnum(EStrategy),
     input: z.object({
         include: z.array(z.string()).default(defaults.input.include),
@@ -53,5 +53,5 @@ export const BemPlusGeneratorConfig = z.object({
     }).default(defaults.output)
 }).default(defaults)
 
-export type TBemPlusClassGeneratorConfigInput = z.input<typeof BemPlusGeneratorConfig>
-export type TBemPlusClassGeneratorConfigOutput = z.output<typeof BemPlusGeneratorConfig>
+export type TBemPlusClassGeneratorConfigInput = z.input<typeof BemPlusClassGeneratorConfig>
+export type TBemPlusClassGeneratorConfigOutput = z.output<typeof BemPlusClassGeneratorConfig>

@@ -18,7 +18,7 @@ const defaults = {
     }
 }
 
-export const BemPlusGeneratorConfig = z.object({
+export const BemPlusSassGeneratorConfig = z.object({
     input: z.object({
         include: z.array(z.string()).default(defaults.input.include),
         exclude: z.array(z.string()).default(defaults.input.exclude),
@@ -35,5 +35,5 @@ export const BemPlusGeneratorConfig = z.object({
     }).default(defaults.output)
 }).default(defaults)
 
-export type TBemPlusSassGeneratorConfigInput = z.input<typeof BemPlusGeneratorConfig>
-export type TBemPlusSassGeneratorConfigOutput = z.output<typeof BemPlusGeneratorConfig>
+export type TBemPlusSassGeneratorConfigInput = z.input<typeof BemPlusSassGeneratorConfig>
+export type TBemPlusSassGeneratorConfigOutput = z.output<typeof BemPlusSassGeneratorConfig>

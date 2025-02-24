@@ -10,5 +10,5 @@ export const elementPropertyTemplate = ({
     className: string
     element: string
     single?: boolean
-}) => `${camel(element)}${colonType(`${className}${single ? '' : '[]'}`, isTypeScript, single)}${single ? '' : '= []'}\n`
+}) => `${camel(element)}${colonType(`${className}${single ? '' : '[]'}`, isTypeScript, single)}${single ? '' : ' = []'}\n`
 

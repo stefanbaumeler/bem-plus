@@ -1598,7 +1598,7 @@ class PlusBlock extends _Block__WEBPACK_IMPORTED_MODULE_4__.Block {
     }
     async init() {
         const buffer = await fs__WEBPACK_IMPORTED_MODULE_1___default().promises.readFile(this.inputPath).then((buffer) => buffer.toString());
-        this.input = this.matchers.removeComments(buffer.toString());
+        this.input = this.matchers.removeComments(buffer);
         if (this.verifyFileIsBlock()) {
             this.getElements();
             this.generateModule();
@@ -1810,7 +1810,7 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-  BemPlusGeneratorConfig: function() { return BemPlusGeneratorConfig; }
+  BemPlusClassGeneratorConfig: function() { return BemPlusClassGeneratorConfig; }
 });
 /* harmony import */var zod__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! zod */ "./node_modules/zod/lib/index.mjs");
 /* harmony import */var _types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./types */ "./src/generator/types.ts");
@@ -1819,7 +1819,7 @@ __webpack_require__.d(__webpack_exports__, {
 const defaults = {
     strategy: _types__WEBPACK_IMPORTED_MODULE_0__.EStrategy.dist,
     input: {
-        include: ['**/*.scss', '**/*.sass'],
+        include: ['**/*.{scss,sass}'],
         exclude: ['node_modules/**'],
         excludeBlocks: [],
         separators: {
@@ -1841,7 +1841,7 @@ const defaults = {
         onComplete: () => { }
     }
 };
-const BemPlusGeneratorConfig = zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
+const BemPlusClassGeneratorConfig = zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
     strategy: zod__WEBPACK_IMPORTED_MODULE_1__.z.nativeEnum(_types__WEBPACK_IMPORTED_MODULE_0__.EStrategy),
     input: zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
         include: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(defaults.input.include),
@@ -1896,7 +1896,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 /* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../helpers */ "./src/helpers.ts");
 
-const elementPropertyTemplate = ({ isTypeScript, className, element, single }) => `${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element)}${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.colonType)(`${className}${single ? '' : '[]'}`, isTypeScript, single)}${single ? '' : '= []'}\n`;
+const elementPropertyTemplate = ({ isTypeScript, className, element, single }) => `${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element)}${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.colonType)(`${className}${single ? '' : '[]'}`, isTypeScript, single)}${single ? '' : ' = []'}\n`;
 
 
 }),
@@ -1909,7 +1909,7 @@ __webpack_require__.d(__webpack_exports__, {
 /* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../helpers */ "./src/helpers.ts");
 
 const elementReferenceTemplate = ({ isTypeScript, className, block, element, separators }) => element.props.single
-    ? `this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = new ${className}(this.root.el.querySelector${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')!)`
+    ? `this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = new ${className}(this.root.el.querySelector${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')${isTypeScript ? '!' : ''})`
     : `this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = [...this.root.el.querySelectorAll${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el));`;
 
 
@@ -14464,7 +14464,7 @@ __webpack_require__.d(__webpack_exports__, {
 
 class BemPlusClassGeneratorPlugin {
     constructor(options) {
-        this.options = _generator_schema__WEBPACK_IMPORTED_MODULE_0__.BemPlusGeneratorConfig.parse(options);
+        this.options = _generator_schema__WEBPACK_IMPORTED_MODULE_0__.BemPlusClassGeneratorConfig.parse(options);
     }
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     apply(compiler) {
@@ -14472,7 +14472,7 @@ class BemPlusClassGeneratorPlugin {
             const generator = new _generator_generator__WEBPACK_IMPORTED_MODULE_1__.BemPlusClassGenerator(this.options, compiler.outputPath);
             generator.generate();
         };
-        compiler.hooks.additionalPass.tap('@bem-plus/class-generator plugin', callback);
+        compiler.hooks.afterEmit.tap('@bem-plus/class-generator plugin', callback);
     }
 }
 

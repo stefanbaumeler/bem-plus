@@ -48,7 +48,7 @@ export class PlusBlock extends Block {
 
     async init() {
         const buffer = await fs.promises.readFile(this.inputPath).then((buffer) => buffer.toString())
-        this.input = this.matchers.removeComments(buffer.toString())
+        this.input = this.matchers.removeComments(buffer)
 
         if (this.verifyFileIsBlock()) {
             this.getElements()

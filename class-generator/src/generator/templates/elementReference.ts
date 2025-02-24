@@ -17,5 +17,5 @@ export const elementReferenceTemplate = ({
     element: Element
     separators: TSeparators
 }) => element.props.single
-    ? `this.${camel(element.escapedName)} = new ${className}(this.root.el.querySelector${angleType(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')!)`
+    ? `this.${camel(element.escapedName)} = new ${className}(this.root.el.querySelector${angleType(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')${isTypeScript ? '!' : ''})`
     : `this.${camel(element.escapedName)} = [...this.root.el.querySelectorAll${angleType(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el));`
