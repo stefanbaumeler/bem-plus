@@ -28,7 +28,7 @@ const defaults = {
 }
 
 export const BemPlusClassGeneratorConfig = z.object({
-    strategy: z.nativeEnum(EStrategy),
+    strategy: z.enum(['plus', 'dist']),
     input: z.object({
         include: z.array(z.string()).default(defaults.input.include),
         exclude: z.array(z.string()).default(defaults.input.exclude),
@@ -41,8 +41,8 @@ export const BemPlusClassGeneratorConfig = z.object({
     }).default(defaults.input),
     output: z.object({
         autoloader: z.boolean().default(defaults.output.autoloader),
-        language: z.nativeEnum(EOutputLanguage).default(defaults.output.language),
-        mode: z.nativeEnum(EOutputMode).default(defaults.output.mode),
+        language: z.enum(['js', 'ts']).default(defaults.output.language),
+        mode: z.enum(['relative', 'absolute']).default(defaults.output.mode),
         path: z.string().default(defaults.output.path),
         filename: z.function().args(z.string(), z.string()).returns(z.string()).default(() => defaults.output.filename),
         prefix: z.string().default(defaults.output.prefix),

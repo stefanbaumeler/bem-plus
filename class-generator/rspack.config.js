@@ -1,10 +1,14 @@
 const path = require('path')
+
 module.exports = {
     externalsPresets: {
         node: true
     },
     mode: 'development',
-    entry: './src/index.ts',
+    entry:  {
+        index: './src/index.ts',
+        module: './module.ts'
+    },
     module: {
         rules: [
             {
@@ -18,11 +22,11 @@ module.exports = {
         extensions: ['.ts', '.js'],
     },
     output: {
-        filename: 'index.js',
+        filename: '[name].js',
         path: path.resolve('dist'),
         library: {
             type: 'umd',
         },
         globalObject: 'this'
-    },
+    }
 };

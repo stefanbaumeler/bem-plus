@@ -1842,7 +1842,7 @@ const defaults = {
     }
 };
 const BemPlusClassGeneratorConfig = zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
-    strategy: zod__WEBPACK_IMPORTED_MODULE_1__.z.nativeEnum(_types__WEBPACK_IMPORTED_MODULE_0__.EStrategy),
+    strategy: zod__WEBPACK_IMPORTED_MODULE_1__.z["enum"](['plus', 'dist']),
     input: zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
         include: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(defaults.input.include),
         exclude: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(defaults.input.exclude),
@@ -1855,8 +1855,8 @@ const BemPlusClassGeneratorConfig = zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
     }).default(defaults.input),
     output: zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
         autoloader: zod__WEBPACK_IMPORTED_MODULE_1__.z.boolean().default(defaults.output.autoloader),
-        language: zod__WEBPACK_IMPORTED_MODULE_1__.z.nativeEnum(_types__WEBPACK_IMPORTED_MODULE_0__.EOutputLanguage).default(defaults.output.language),
-        mode: zod__WEBPACK_IMPORTED_MODULE_1__.z.nativeEnum(_types__WEBPACK_IMPORTED_MODULE_0__.EOutputMode).default(defaults.output.mode),
+        language: zod__WEBPACK_IMPORTED_MODULE_1__.z["enum"](['js', 'ts']).default(defaults.output.language),
+        mode: zod__WEBPACK_IMPORTED_MODULE_1__.z["enum"](['relative', 'absolute']).default(defaults.output.mode),
         path: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.output.path),
         filename: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().args(zod__WEBPACK_IMPORTED_MODULE_1__.z.string(), zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).returns(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(() => defaults.output.filename),
         prefix: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.output.prefix),
