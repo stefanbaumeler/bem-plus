@@ -40,11 +40,12 @@ export const getFileContents = async (paths: string[]) => {
     const filePromises = paths.map((filePath) => fs.promises.readFile(filePath))
     const settled = await Promise.allSettled(filePromises)
 
-    return settled.map((result) => {
+    return settled.map((result, key) => {
         if (result.status === 'fulfilled') {
             return {
                 success: true,
-                contents: result.value.toString()
+                contents: result.value.toString(),
+                filePath: paths[key]
             }
         }
 

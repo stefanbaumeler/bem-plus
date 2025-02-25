@@ -16,6 +16,8 @@ export class PlusBlock extends Block {
         hasAnElement: (block: string) => new RegExp(`@mixin ${block}${this.config.input.separators.mixinElement}.*`)
     }
 
+    allModifiers: string[]
+
     constructor({
         config, inputPath, allModifiers
     }: {
@@ -23,8 +25,9 @@ export class PlusBlock extends Block {
         inputPath: string
         allModifiers: string[]
     }) {
-        super(config, allModifiers)
+        super(config)
 
+        this.allModifiers = allModifiers
         this.inputPath = inputPath
 
         const fileName = path.parse(inputPath).name

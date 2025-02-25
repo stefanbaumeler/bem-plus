@@ -15,7 +15,7 @@ export class Block {
     module = ''
     importExport = ''
     autoloader = ''
-    constructor(public config: TBemPlusClassGeneratorConfigOutput, public allModifiers: string[], public name = '') {}
+    constructor(public config: TBemPlusClassGeneratorConfigOutput, public name = '') {}
 
     generateModule() {
         const isTypeScript = this.config.output.language === EOutputLanguage.ts

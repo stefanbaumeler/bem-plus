@@ -12,7 +12,7 @@ export class DistBlock extends Block {
         elementStrings: string[]
         allModifiers: string[]
     }) {
-        super(config, allModifiers, name)
+        super(config, name)
 
         const absolutePath = path.resolve(
             this.config.output.path,

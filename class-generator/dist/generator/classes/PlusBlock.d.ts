@@ -9,6 +9,7 @@ export declare class PlusBlock extends Block {
         hasIndex: (block: string) => RegExp;
         hasAnElement: (block: string) => RegExp;
     };
+    allModifiers: string[];
     constructor({ config, inputPath, allModifiers }: {
         config: TBemPlusClassGeneratorConfigOutput;
         inputPath: string;

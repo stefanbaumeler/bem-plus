@@ -11,14 +11,20 @@ import { SameSeparatorError } from './errors/SameSeparatorError'
 import { InvalidSeparatorError } from './errors/InvalidSeparatorError'
 import { Autoloader } from './classes/Autoloader'
 
+// @ts-ignore
+import { compileString } from 'sass'
+
 export class BemPlusClassGenerator {
-    dist = ''
     blocks: Block[] = []
-    allModifiers: string[] = []
     matchers = {
         bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
         blockElement: new RegExp(`[^(\\d.\\n]*${this.config.input.separators.element}.+?(?=${this.config.input.separators.modifier}|[ .,[:#{)>+])`, 'g'),
-        blockElementModifier: new RegExp(`(?<!(var\\(|{|;))[^(.\\n!{]*${this.config.input.separators.modifier}[^ .,[:#{)>+]*`, 'g')
+        blockElementModifier: new RegExp(`(?<!(var\\(|{|;))[^(.\\n!{]*${this.config.input.separators.modifier}[^ .,[:#{)>+]*`, 'g'),
+        elementMixins: (block: string) => new RegExp(`@mixin ${block}-[\\s\\S]*?(?<!( ))}`, 'g'),
+        elementName: (block: string) => new RegExp(`(?<=@mixin ${block}-)[^{ (]*`),
+        subSelectors: new RegExp('(&|@at-root|  \\.).*(?<!([ {]))', 'g'),
+        ampModifier: new RegExp('(?<=&--)[^ \\s.]*', 'g'),
+        subModifier: new RegExp('(?<=\\.)[^)\\s.]*--[^)\\s.]*', 'g')
     }
 
     constructor(public config: TBemPlusClassGeneratorConfigOutput, public distPath: string) {
@@ -26,9 +32,7 @@ export class BemPlusClassGenerator {
     }
 
     async generate() {
-        this.dist = await this.getBuiltContent()
-        this.allModifiers = this.dist.match(this.matchers.blockElementModifier) || []
-        this.blocks = this.config.strategy === EStrategy.plus ? await this.getPlusBlocks() : this.getDistBlocks()
+        this.blocks = this.config.strategy === EStrategy.plus ? await this.getPlusBlocks() : await this.getDistBlocks()
 
         await this.initBlocks()
         await this.writeModules()
@@ -62,25 +66,22 @@ export class BemPlusClassGenerator {
             ignore: this.config.input.exclude
         })
 
-        const fileNames = filePaths.map((filePath) => {
-            const fileName = path.parse(filePath).name
+        const allModifiers = await this.getPlusModifiers(filePaths)
 
-            return fileName.startsWith('_') ? fileName.substring(1) : fileName
-        })
-
-        const filePathsThatNeedContent = filePaths.filter((filePath, k) => this.dist.includes(`.${fileNames[k]}`))
-
-        return filePathsThatNeedContent.map((filePath) => new PlusBlock({
+        return filePaths.map((filePath) => new PlusBlock({
             config: this.config,
             inputPath: filePath,
-            allModifiers: this.allModifiers
+            allModifiers
         }))
     }
 
-    getDistBlocks(): Block[] {
-        const elements = this.dist.match(this.matchers.blockElement) || []
+    async getDistBlocks(): Promise<Block[]> {
+        const dist = await this.getBuiltContent()
+        const allModifiers = dist.match(this.matchers.blockElementModifier) || []
+
+        const elements = dist.match(this.matchers.blockElement) || []
         const blocksFromElements = elements.map((element) => element.split(this.config.input.separators.element)[0])
-        const blocksFromModifiers = this.allModifiers.map((modifier) => modifier.split(this.matchers.bemSeparator)[0])
+        const blocksFromModifiers = allModifiers.map((modifier) => modifier.split(this.matchers.bemSeparator)[0])
 
         return unique([...blocksFromElements, ...blocksFromModifiers])
             .filter((block) => !this.config.input.excludeBlocks.includes(block))
@@ -88,8 +89,42 @@ export class BemPlusClassGenerator {
                 config: this.config,
                 name,
                 elementStrings: elements,
-                allModifiers: this.allModifiers
+                allModifiers
             }))
+    }
+
+    async getPlusModifiers(filePaths: string[]) {
+        const fileContents = await getFileContents(filePaths)
+        let allModifiers: string[] = []
+
+        fileContents.forEach((fileRequest) => {
+            const fileName = path.parse(fileRequest.filePath!).name
+            const blockName = fileName.startsWith('_') ? fileName.substring(1) : fileName
+
+            if (fileRequest.success) {
+                const elementMixins = fileRequest.contents.match(this.matchers.elementMixins(blockName))
+
+                elementMixins?.forEach((elementMixin) => {
+                    const elementName = elementMixin.match(this.matchers.elementName(blockName))
+                    const subSelectors = elementMixin.match(this.matchers.subSelectors)
+
+                    subSelectors?.forEach((selector) => {
+                        const directMatch = selector.match(this.matchers.ampModifier)
+                        allModifiers.push(...selector.match(this.matchers.subModifier) ?? [])
+
+                        if (directMatch) {
+                            if (elementName![0] === 'root') {
+                                allModifiers.push(`${blockName}--${directMatch}`)
+                            } else {
+                                allModifiers.push(`${blockName}__${elementName![0]}--${directMatch}`)
+                            }
+                        }
+                    })
+                })
+            }
+        })
+
+        return unique(allModifiers)
     }
 
     validateSeparators() {
@@ -111,9 +146,21 @@ export class BemPlusClassGenerator {
     }
 
     async getBuiltContent() {
-        const filePaths = await glob(`${this.distPath}/**/*.css`)
-        const fileContents = await getFileContents(filePaths)
+        if (this.config.strategy === EStrategy.plus) {
+            const filePaths = await glob(this.config.input.include, {
+                ignore: this.config.input.exclude
+            })
 
-        return fileContents.map((fileContents) => fileContents.contents).join(' ')
+            const fileContents = await getFileContents(filePaths)
+            const parsedFiles = fileContents.map((fileContent) => compileString(fileContent.contents))
+
+            return parsedFiles.join(' ')
+        }
+        else {
+            const filePaths = await glob(`${this.distPath}/**/*.css`)
+            const fileContents = await getFileContents(filePaths)
+
+            return fileContents.map((fileContents) => fileContents.contents).join(' ')
+        }
     }
 }
