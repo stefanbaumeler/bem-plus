@@ -11,8 +11,8 @@ export class PlusBlock extends Block {
     inputPath
     matchers = {
         removeComments: (input: string) => input.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, ''),
-        element: (block: string) => new RegExp(`(?<=&${this.config.input.separators.element})[^ {(]*(?=.*\\n.*@include ${block}${this.config.input.separators.mixinElement})`, 'g'),
-        hasIndex: (block: string) => new RegExp(`@mixin ${block}([ \\t(]*[({]|[\\s\\S]).*[\\s\\S].*\\.${block}`),
+        element: (block: string) => new RegExp(`(?<=&${this.config.input.separators.element})[^\\s{(]*(?=.*\\r?\\n.*@include ${block}${this.config.input.separators.mixinElement})`, 'g'),
+        hasIndex: (block: string) => new RegExp(`@mixin ${block}[^.-]*\\.${block} {`),
         hasAnElement: (block: string) => new RegExp(`@mixin ${block}${this.config.input.separators.mixinElement}.*`)
     }
 

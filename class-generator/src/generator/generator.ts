@@ -11,14 +11,11 @@ import { SameSeparatorError } from './errors/SameSeparatorError'
 import { InvalidSeparatorError } from './errors/InvalidSeparatorError'
 import { Autoloader } from './classes/Autoloader'
 
-// @ts-ignore
-import { compileString } from 'sass'
-
 export class BemPlusClassGenerator {
     blocks: Block[] = []
     matchers = {
         bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
-        blockElement: new RegExp(`[^(\\d.\\n]*${this.config.input.separators.element}.+?(?=${this.config.input.separators.modifier}|[ .,[:#{)>+])`, 'g'),
+        blockElement: new RegExp(`[^(\\d.\\r\\n]*${this.config.input.separators.element}.+?(?=${this.config.input.separators.modifier}|[ .,[:#{)>+])`, 'g'),
         blockElementModifier: new RegExp(`(?<!(var\\(|{|;))[^(.\\n!{]*${this.config.input.separators.modifier}[^ .,[:#{)>+]*`, 'g'),
         elementMixins: (block: string) => new RegExp(`@mixin ${block}-[\\s\\S]*?(?<!( ))}`, 'g'),
         elementName: (block: string) => new RegExp(`(?<=@mixin ${block}-)[^{ (]*`),
@@ -146,21 +143,9 @@ export class BemPlusClassGenerator {
     }
 
     async getBuiltContent() {
-        if (this.config.strategy === EStrategy.plus) {
-            const filePaths = await glob(this.config.input.include, {
-                ignore: this.config.input.exclude
-            })
+        const filePaths = await glob(`${this.distPath}/**/*.css`)
+        const fileContents = await getFileContents(filePaths)
 
-            const fileContents = await getFileContents(filePaths)
-            const parsedFiles = fileContents.map((fileContent) => compileString(fileContent.contents))
-
-            return parsedFiles.join(' ')
-        }
-        else {
-            const filePaths = await glob(`${this.distPath}/**/*.css`)
-            const fileContents = await getFileContents(filePaths)
-
-            return fileContents.map((fileContents) => fileContents.contents).join(' ')
-        }
+        return fileContents.map((fileContents) => fileContents.contents).join(' ')
     }
 }
