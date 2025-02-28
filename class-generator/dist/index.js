@@ -2004,7 +2004,7 @@ const moduleTemplate = ({ isTypeScript, className, elementProperties, elementCla
 
 ${prefix}
 
-import { BemPlusModule } from '@bem-plus/class-generator'
+import { BemPlusModule } from '@bem-plus/class-generator/src/module'
 ${elementClasses}
 export class ${className} extends BemPlusModule {
     root;
@@ -2122,33 +2122,6 @@ const getFileContents = async (paths) => {
         };
     });
 };
-
-
-}),
-"./src/module.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-__webpack_require__.d(__webpack_exports__, {
-  BemPlusModule: function() { return BemPlusModule; }
-});
-class BemPlusModule {
-    constructor(rootElement, k) {
-        var _a;
-        this.index = 0;
-        this.refresh = () => { };
-        if (k) {
-            this.index = k;
-        }
-        this.type = this.constructor.name;
-        this.rootClass = (_a = rootElement.classList[0]) === null || _a === void 0 ? void 0 : _a.split('__')[0];
-        new MutationObserver(() => {
-            this.refresh();
-        }).observe(rootElement, {
-            childList: true,
-            subtree: true
-        });
-    }
-}
 
 
 }),
@@ -14532,13 +14505,10 @@ var __webpack_exports__ = {};
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-  BemPlusClassGeneratorPlugin: function() { return BemPlusClassGeneratorPlugin; },
-  BemPlusModule: function() { return /* reexport safe */ _module__WEBPACK_IMPORTED_MODULE_2__.BemPlusModule; }
+  BemPlusClassGeneratorPlugin: function() { return BemPlusClassGeneratorPlugin; }
 });
 /* harmony import */var _generator_schema__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./generator/schema */ "./src/generator/schema.ts");
 /* harmony import */var _generator_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./generator/generator */ "./src/generator/generator.ts");
-/* harmony import */var _module__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./module */ "./src/module.ts");
-
 
 
 class BemPlusClassGeneratorPlugin {
