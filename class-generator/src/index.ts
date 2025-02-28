@@ -5,6 +5,8 @@ import {
 } from './generator/schema'
 import { BemPlusClassGenerator } from './generator/generator'
 
+export * from './module'
+
 export class BemPlusClassGeneratorPlugin {
     options: TBemPlusClassGeneratorConfigOutput
     constructor(options: TBemPlusClassGeneratorConfigInput) {

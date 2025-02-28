@@ -3,19 +3,22 @@ import { colonType, indent } from '../../helpers'
 export const elementClassTemplate = ({
     isTypeScript,
     className,
+    selector,
     type,
-    modifiers
+    modifiers,
+    args
 }: {
     isTypeScript: boolean
     className: string
+    selector: string
     type: string
     modifiers: string
+    args: string
 }) =>
     `export class ${className} {
-    el;
     ${indent(modifiers, 1)}
-    constructor(el${colonType(type, isTypeScript)}) {
-        this.el = el;
-    }
+    static el: '${selector}'
+    ${indent(args, 1)}
+    constructor(public el${colonType(type, isTypeScript)}) {}
 }
 `

@@ -5,6 +5,7 @@ export declare class Element {
             include: string[];
             exclude: string[];
             excludeBlocks: string[];
+            rootMixinSuffix: string;
             separators: {
                 element: string;
                 modifier: string;
@@ -30,7 +31,6 @@ export declare class Element {
     selector: string;
     props: {
         [key: string]: string;
-        type: string;
     };
     modifiers: {
         name: string;

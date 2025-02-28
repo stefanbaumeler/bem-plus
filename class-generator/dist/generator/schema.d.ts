@@ -5,6 +5,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodDefault<z.ZodObject<{
         include: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         exclude: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         excludeBlocks: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        rootMixinSuffix: z.ZodDefault<z.ZodString>;
         separators: z.ZodDefault<z.ZodObject<{
             element: z.ZodDefault<z.ZodString>;
             modifier: z.ZodDefault<z.ZodString>;
@@ -22,6 +23,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodDefault<z.ZodObject<{
         include: string[];
         exclude: string[];
         excludeBlocks: string[];
+        rootMixinSuffix: string;
         separators: {
             element: string;
             modifier: string;
@@ -31,6 +33,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodDefault<z.ZodObject<{
         include?: string[] | undefined;
         exclude?: string[] | undefined;
         excludeBlocks?: string[] | undefined;
+        rootMixinSuffix?: string | undefined;
         separators?: {
             element?: string | undefined;
             modifier?: string | undefined;
@@ -76,6 +79,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodDefault<z.ZodObject<{
         include: string[];
         exclude: string[];
         excludeBlocks: string[];
+        rootMixinSuffix: string;
         separators: {
             element: string;
             modifier: string;
@@ -101,6 +105,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodDefault<z.ZodObject<{
         include?: string[] | undefined;
         exclude?: string[] | undefined;
         excludeBlocks?: string[] | undefined;
+        rootMixinSuffix?: string | undefined;
         separators?: {
             element?: string | undefined;
             modifier?: string | undefined;

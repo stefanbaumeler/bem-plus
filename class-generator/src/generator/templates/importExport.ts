@@ -1,1 +1,1 @@
-export const importExportTemplate = (path: string) => `export * from '${path}';`
+export const importExportTemplate = (path: string) => `export * from '${path}'`

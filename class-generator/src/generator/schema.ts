@@ -7,6 +7,7 @@ const defaults = {
         include: ['**/*.{scss,sass}'],
         exclude: ['node_modules/**'],
         excludeBlocks: [],
+        rootMixinSuffix: 'root',
         separators: {
             element: '__',
             modifier: '--',
@@ -33,6 +34,7 @@ export const BemPlusClassGeneratorConfig = z.object({
         include: z.array(z.string()).default(defaults.input.include),
         exclude: z.array(z.string()).default(defaults.input.exclude),
         excludeBlocks: z.array(z.string()).default(defaults.input.excludeBlocks),
+        rootMixinSuffix: z.string().default(defaults.input.rootMixinSuffix),
         separators: z.object({
             element: z.string().default(defaults.input.separators.element),
             modifier: z.string().default(defaults.input.separators.modifier),

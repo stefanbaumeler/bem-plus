@@ -17,11 +17,11 @@ export class BemPlusClassGenerator {
         bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
         blockElement: new RegExp(`[^(\\d.\\r\\n]*${this.config.input.separators.element}.+?(?=${this.config.input.separators.modifier}|[ .,[:#{)>+])`, 'g'),
         blockElementModifier: new RegExp(`(?<!(var\\(|{|;))[^(.\\n!{]*${this.config.input.separators.modifier}[^ .,[:#{)>+]*`, 'g'),
-        elementMixins: (block: string) => new RegExp(`@mixin ${block}-[\\s\\S]*?(?<!( ))}`, 'g'),
-        elementName: (block: string) => new RegExp(`(?<=@mixin ${block}-)[^{ (]*`),
-        subSelectors: new RegExp('(&|@at-root|  \\.).*(?<!([ {]))', 'g'),
-        ampModifier: new RegExp('(?<=&--)[^ \\s.]*', 'g'),
-        subModifier: new RegExp('(?<=\\.)[^)\\s.]*--[^)\\s.]*', 'g')
+        elementMixins: (block: string) => new RegExp(`(?<!(\\/\\/.*))@mixin ${block}${this.config.input.separators.mixinElement}[\\s\\S]*?(?<!( ))}`, 'g'),
+        elementName: (block: string) => new RegExp(`(?<!(\\/\\/.*))(?<=@mixin ${block}${this.config.input.separators.mixinElement})[^{ (]*`),
+        subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root|  \\.).*(?<!([ {]))', 'g'),
+        ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ \\s.]*`, 'g'),
+        subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^)\\s.]*`, 'g')
     }
 
     constructor(public config: TBemPlusClassGeneratorConfigOutput, public distPath: string) {
@@ -106,14 +106,16 @@ export class BemPlusClassGenerator {
                     const subSelectors = elementMixin.match(this.matchers.subSelectors)
 
                     subSelectors?.forEach((selector) => {
-                        const directMatch = selector.match(this.matchers.ampModifier)
-                        allModifiers.push(...selector.match(this.matchers.subModifier) ?? [])
+                        const directMatch = selector.match(this.matchers.ampModifier) ?? []
+                        const subMatch = selector.match(this.matchers.subModifier) ?? []
 
-                        if (directMatch) {
+                        allModifiers.push(...subMatch)
+
+                        if (directMatch.length) {
                             if (elementName![0] === 'root') {
-                                allModifiers.push(`${blockName}--${directMatch}`)
+                                allModifiers.push(`${blockName}${this.config.input.separators.modifier}${directMatch}`)
                             } else {
-                                allModifiers.push(`${blockName}__${elementName![0]}--${directMatch}`)
+                                allModifiers.push(`${blockName}${this.config.input.separators.element}${elementName![0]}${this.config.input.separators.modifier}${directMatch}`)
                             }
                         }
                     })

@@ -25,7 +25,7 @@ export const moduleTemplate = ({
 
 ${prefix}
 
-import { BemPlusModule } from '@bem-plus/class-generator/module';
+import { BemPlusModule } from '@bem-plus/class-generator'
 ${elementClasses}
 export class ${className} extends BemPlusModule {
     root;
@@ -36,7 +36,7 @@ export class ${className} extends BemPlusModule {
 
         ${rootReference}
 
-        this.refresh();
+        this.refresh()
     }
 
     refresh = () => {

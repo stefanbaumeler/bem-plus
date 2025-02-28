@@ -1,9 +1,5 @@
-import { TSeparators } from '../types';
-export declare const modifierTemplate: ({ block, element, modifier, escaped, isTypeScript, separators }: {
-    block: string;
-    element: string;
+export declare const modifierTemplate: ({ modifier, selector, isTypeScript }: {
     modifier: string;
-    escaped?: boolean;
+    selector: string;
     isTypeScript: boolean;
-    separators: TSeparators;
 }) => string;

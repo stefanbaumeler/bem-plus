@@ -6,4 +6,4 @@ export const rootReferenceTemplate = ({
 }: {
     isTypeScript: boolean
     className: string
-}) => `this.root = new ${className}RootElement(${angleType('HTMLElement', isTypeScript)}rootElement);`
+}) => `this.root = new ${className}RootElement(${angleType('HTMLElement', isTypeScript)}rootElement)`

@@ -6,6 +6,7 @@ import { elementReferenceTemplate } from '../templates/elementReference'
 import { elementPropertyTemplate } from '../templates/elementProperty'
 import messages from '../messages'
 import { RESERVED_NAMES } from '../const'
+import { elementArgumentTemplate } from '../templates/elementArgumentTemplate'
 
 export class Element {
     config
@@ -14,7 +15,6 @@ export class Element {
     selector
     props: {
         [key: string]: string
-        type: string
     } = {
             type: 'HTMLElement'
         }
@@ -108,22 +108,26 @@ export class Element {
     generateTemplates(block: string, isTypeScript: boolean) {
         const modifierProperties = this.modifiers.map((modifier) => {
             return modifierTemplate({
-                block,
-                element: this.name === 'root' ? '' : this.name,
-                modifier: modifier.name,
-                escaped: modifier.escaped,
-                isTypeScript,
-                separators: this.config.input.separators
+                modifier: `${modifier.escaped ? '_' : ''}${camel(modifier.name)}`,
+                selector: `${block}${this.name === 'root' ? '' : `${this.config.input.separators.element}${this.name}`}${this.config.input.separators.modifier}${modifier.name}`,
+                isTypeScript
             })
         })
 
         const className =  this.config.output.elementClass(pascal(block, this.name))
 
+        const args = Object.entries(this.props).filter(([key]) => !['type', 'single'].includes(key)).map(([key, value]) => elementArgumentTemplate({
+            key,
+            value
+        }))
+
         const elementClass = elementClassTemplate({
             isTypeScript,
             className,
+            selector: `.${block}${this.name === 'root' ? '' : `${this.config.input.separators.element}${this.name}`}`,
             type: this.props.type,
-            modifiers: modifierProperties.join('')
+            modifiers: modifierProperties.join(''),
+            args: args.join('')
         })
 
         return {

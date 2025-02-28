@@ -30,7 +30,7 @@ export class DistBlock extends Block {
     }
 
     getElements(elementStrings: string[], allModifiers: string[]) {
-        this.elements = ['root', ...elementStrings]
+        this.elements = [this.config.input.rootMixinSuffix, ...elementStrings]
             .map((elementString) => new Element({
                 config: this.config,
                 name: elementString.split(this.config.input.separators.element)[0],
