@@ -1725,9 +1725,11 @@ class BemPlusClassGenerator {
         this.blocks = this.config.strategy === _types__WEBPACK_IMPORTED_MODULE_1__.EStrategy.plus ? await this.getPlusBlocks() : await this.getDistBlocks();
         await this.initBlocks();
         await this.writeModules();
-        const barrel = new _classes_Barrel__WEBPACK_IMPORTED_MODULE_6__.Barrel(this.config, this.blocks);
-        await barrel.clearObsoleteModules();
-        await barrel.write();
+        if (this.config.output.mode === _types__WEBPACK_IMPORTED_MODULE_1__.EOutputMode.absolute) {
+            const barrel = new _classes_Barrel__WEBPACK_IMPORTED_MODULE_6__.Barrel(this.config, this.blocks);
+            await barrel.clearObsoleteModules();
+            await barrel.write();
+        }
         if (this.config.output.autoloader) {
             const autoloader = new _classes_Autoloader__WEBPACK_IMPORTED_MODULE_9__.Autoloader(this.config, this.blocks);
             await autoloader.write();

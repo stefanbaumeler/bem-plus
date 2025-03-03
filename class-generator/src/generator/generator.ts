@@ -1,6 +1,6 @@
 import { TBemPlusClassGeneratorConfigOutput } from './schema'
 import { glob } from 'glob'
-import { EStrategy } from './types'
+import { EOutputMode, EStrategy } from './types'
 import path from 'node:path'
 import { PlusBlock } from './classes/PlusBlock'
 import { Block } from './classes/Block'
@@ -34,10 +34,12 @@ export class BemPlusClassGenerator {
         await this.initBlocks()
         await this.writeModules()
 
-        const barrel = new Barrel(this.config, this.blocks)
+        if (this.config.output.mode === EOutputMode.absolute) {
+            const barrel = new Barrel(this.config, this.blocks)
 
-        await barrel.clearObsoleteModules()
-        await barrel.write()
+            await barrel.clearObsoleteModules()
+            await barrel.write()
+        }
 
         if (this.config.output.autoloader) {
             const autoloader = new Autoloader(this.config, this.blocks)
