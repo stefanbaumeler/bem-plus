@@ -1716,7 +1716,7 @@ class BemPlusClassGenerator {
             elementMixins: (block) => new RegExp(`(?<!(\\/\\/.*))@mixin ${block}${this.config.input.separators.mixinElement}[\\s\\S]*?(?<!( ))}`, 'g'),
             elementName: (block) => new RegExp(`(?<!(\\/\\/.*))(?<=@mixin ${block}${this.config.input.separators.mixinElement})[^{ (]*`),
             subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root|  \\.).*(?<!([ {]))', 'g'),
-            ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ \\s.]*`, 'g'),
+            ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ ,:>+~.#[|\\s]*`, 'g'),
             subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^)\\s.]*`, 'g')
         };
         this.validateSeparators();
@@ -1786,7 +1786,7 @@ class BemPlusClassGenerator {
                         const directMatch = (_a = selector.match(this.matchers.ampModifier)) !== null && _a !== void 0 ? _a : [];
                         const subMatch = (_b = selector.match(this.matchers.subModifier)) !== null && _b !== void 0 ? _b : [];
                         allModifiers.push(...subMatch);
-                        if (directMatch.length) {
+                        if (`${directMatch}`.length) {
                             if (elementName[0] === 'root') {
                                 allModifiers.push(`${blockName}${this.config.input.separators.modifier}${directMatch}`);
                             }

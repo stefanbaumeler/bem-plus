@@ -20,7 +20,7 @@ export class BemPlusClassGenerator {
         elementMixins: (block: string) => new RegExp(`(?<!(\\/\\/.*))@mixin ${block}${this.config.input.separators.mixinElement}[\\s\\S]*?(?<!( ))}`, 'g'),
         elementName: (block: string) => new RegExp(`(?<!(\\/\\/.*))(?<=@mixin ${block}${this.config.input.separators.mixinElement})[^{ (]*`),
         subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root|  \\.).*(?<!([ {]))', 'g'),
-        ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ \\s.]*`, 'g'),
+        ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ ,:>+~.#[|\\s]*`, 'g'),
         subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^)\\s.]*`, 'g')
     }
 
@@ -113,7 +113,7 @@ export class BemPlusClassGenerator {
 
                         allModifiers.push(...subMatch)
 
-                        if (directMatch.length) {
+                        if (`${directMatch}`.length) {
                             if (elementName![0] === 'root') {
                                 allModifiers.push(`${blockName}${this.config.input.separators.modifier}${directMatch}`)
                             } else {

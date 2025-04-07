@@ -1,8 +1,9 @@
 {
     "name": "@bem-plus/class-generator",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "",
     "main": "dist/index.js",
+    "keywords": ["BEM", "CSS", "SCSS", "Sass", "generator", "webpack", "node", "typescript", "ts", "oop", "object-oriented", "class"],
     "scripts": {
         "build": "rspack build & tsc --emitDeclarationOnly"
     },
