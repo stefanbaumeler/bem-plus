@@ -24,7 +24,7 @@ export class Element {
     }[]
     matchers = {
         elementProps: (block: string, element: string) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}${element}.*\\()[^)]*`, 'g'),
-        invalidFirstCharacter: new RegExp('^[\d-].*', 'g')
+        invalidFirstCharacter: new RegExp('^[\\d-].*', 'g')
     }
 
     constructor({

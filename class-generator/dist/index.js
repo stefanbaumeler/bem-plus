@@ -1457,7 +1457,7 @@ class Element {
         };
         this.matchers = {
             elementProps: (block, element) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}${element}.*\\()[^)]*`, 'g'),
-            invalidFirstCharacter: new RegExp('^[\d-].*', 'g')
+            invalidFirstCharacter: new RegExp('^[\\d-].*', 'g')
         };
         this.name = name;
         if (_const__WEBPACK_IMPORTED_MODULE_6__.RESERVED_NAMES.includes((0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(name))) {
