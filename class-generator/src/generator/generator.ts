@@ -21,7 +21,7 @@ export class BemPlusClassGenerator {
         elementName: (block: string) => new RegExp(`(?<!(\\/\\/.*))(?<=@mixin ${block}${this.config.input.separators.mixinElement})[^{ (]*`),
         subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root| \\.).*(?<!([ {]))', 'g'),
         ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ ,:>+~.#[|\\s]*`, 'g'),
-        subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^ ,:>+~.#[|\\s]*`, 'g')
+        subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^ ),:>+~.#[|\\s]*`, 'g')
     }
 
     constructor(public config: TBemPlusClassGeneratorConfigOutput, public distPath: string) {
