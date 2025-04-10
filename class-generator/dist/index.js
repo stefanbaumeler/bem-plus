@@ -1713,9 +1713,9 @@ class BemPlusClassGenerator {
             bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
             blockElement: new RegExp(`[^(\\d.\\r\\n]*${this.config.input.separators.element}.+?(?=${this.config.input.separators.modifier}|[ .,[:#{)>+])`, 'g'),
             blockElementModifier: new RegExp(`(?<!(var\\(|{|;))[^(.\\n!{]*${this.config.input.separators.modifier}[^ .,[:#{)>+]*`, 'g'),
-            elementMixins: (block) => new RegExp(`(?<!(\\/\\/.*))@mixin ${block}${this.config.input.separators.mixinElement}[\\s\\S]*?(?<!( ))}`, 'g'),
+            elementMixins: (block) => new RegExp(`(?<!(\\/\\/.*))@mixin ${block}${this.config.input.separators.mixinElement}[\\s\\S]*?(?<![ \\S])}`, 'g'),
             elementName: (block) => new RegExp(`(?<!(\\/\\/.*))(?<=@mixin ${block}${this.config.input.separators.mixinElement})[^{ (]*`),
-            subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root|  \\.).*(?<!([ {]))', 'g'),
+            subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root| \\.).*(?<!([ {]))', 'g'),
             ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ ,:>+~.#[|\\s]*`, 'g'),
             subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^ ,:>+~.#[|\\s]*`, 'g')
         };
