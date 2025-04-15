@@ -1456,7 +1456,7 @@ class Element {
             type: 'HTMLElement'
         };
         this.matchers = {
-            elementProps: (block, element) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}${element}.*\\()[^)]*`, 'g'),
+            elementProps: (block, element) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}${element}\\s*\\()[^)]*`, 'g'),
             invalidFirstCharacter: new RegExp('^[\\d-].*', 'g')
         };
         this.name = name;

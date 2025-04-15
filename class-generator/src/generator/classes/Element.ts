@@ -23,7 +23,7 @@ export class Element {
         escaped: boolean
     }[]
     matchers = {
-        elementProps: (block: string, element: string) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}${element}.*\\()[^)]*`, 'g'),
+        elementProps: (block: string, element: string) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}${element}\\s*\\()[^)]*`, 'g'),
         invalidFirstCharacter: new RegExp('^[\\d-].*', 'g')
     }
 
