@@ -1928,7 +1928,7 @@ __webpack_require__.d(__webpack_exports__, {
 
 const elementClassTemplate = ({ isTypeScript, className, selector, type, modifiers, args }) => `export class ${className} {
     ${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.indent)(modifiers, 1)}
-    static el: '${selector}'
+    static el = '${selector}'
     ${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.indent)(args, 1)}
     constructor(public el${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.colonType)(type, isTypeScript)}) {}
 }

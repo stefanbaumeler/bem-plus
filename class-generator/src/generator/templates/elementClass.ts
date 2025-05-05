@@ -17,7 +17,7 @@ export const elementClassTemplate = ({
 }) =>
     `export class ${className} {
     ${indent(modifiers, 1)}
-    static el: '${selector}'
+    static el = '${selector}'
     ${indent(args, 1)}
     constructor(public el${colonType(type, isTypeScript)}) {}
 }
