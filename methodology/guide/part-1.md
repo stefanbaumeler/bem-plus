@@ -36,7 +36,7 @@ Now, how can we figure out, where in our code the color of this link is defined?
 
 So we switch to the final occurrence, of which we now know that it must be the right place. The `.header` selector here contains about 300 lines of code. We search for `.nav` in this file, another eight occurrences. We sieve through all of them, three of them are outside of the `.header` selector, five are inside of it. We look through the five relevant ones, and one of them is finally the one we are looking for. There isn’t a lot of code inside of that selector and we can easily find the `.active` selector. We update the color. Done!
 
-We might have spent five minutes to fix this bug. With experience, you get faster at this detective work. Despite of this, you have to perform this dance again and again. Sometimes ten times a day, sometimes a hundred times. Each time this process takes time. Every time there is a risk that we might forget something, as with this example, where we forgot to check the mobile breakpoint. Or worse, you think you changed the code in the right place, but actually it’s the wrong place. At best you notice your mistak. You reverse your change and perform the dance again. Hopefully, you end up in the right place the second time around. At worst, you change something and don’t notice it also affects other elements. Your bugfix becomes another bug.
+We might have spent five minutes to fix this bug. With experience, you get faster at this detective work. Despite of this, you have to perform this dance again and again. Sometimes ten times a day, sometimes a hundred times. Each time this process takes time. Every time there is a risk that we might forget something, as with this example, where we forgot to check the mobile breakpoint. Or worse, you think you changed the code in the right place, but actually it’s the wrong place. At best you notice your mistake. You reverse your change and perform the dance again. Hopefully, you end up in the right place the second time around. At worst, you change something and don’t notice it also affects other elements. Your bugfix becomes another bug.
 
 ### Scattered styles
 
@@ -79,7 +79,7 @@ Variables can be very useful in certain cases, for example with colors. Nobody w
 
 The temptation to use variables as often as possible is huge, but it is important to remember that we essentially group things together by using them. Is the padding below a slider really always the same as below a video? How about the title? Same padding below that, too?
 
-If the designer tells us, that the spacing below the title is too large, do they mean that particular spacing, or that spacing and also the spacing below video and slider? Changes are, they only meant below the title, so now you can no longer use the variable. We now have an exception to the rule. This happens again and again, until we have lots of exceptions.
+If the designer tells us, that the spacing below the title is too large, do they mean that particular spacing, or that spacing and also the spacing below video and slider? Chances are, they only meant below the title, so now you can no longer use the variable. We now have an exception to the rule. This happens again and again, until we have lots of exceptions.
 
 We thought that the grouping made sense, but it turns out it didn’t. By adding exception after exception, we made the group less generally applicable, more specific, more arbitrary.
 
@@ -99,8 +99,8 @@ The problem is that all of those rules are irrelevant, if each member of the tea
 
 ### Missing standardization
 
-If you do things consistently and always the same, you don’t have to think about those things every time you encounter them. The task becomes process you’ve done dozens of times, a well worn path through the woods of uncertainty.
+If you do things consistently and always the same, you don’t have to think about those things every time you encounter them. The task becomes a process that you’ve done dozens of times, a well worn path through the woods of uncertainty.
 
 That, by itself, is already worth a lot. It can accelerate your work tremendously by removing doubts. But standardization is also the first step to automation. If you always do things the same, it means you can teach a computer how to do it. You can also use a standard as a building block for further tooling, to create even more value.
 
-In the next four posts, I’d like to introduce a system that solves all of those problems.
+In the next two posts, I’d like to introduce a system that solves all of those problems.
