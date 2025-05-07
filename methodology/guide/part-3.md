@@ -160,7 +160,7 @@ The mixins we just created are called element mixins. While they are regular mix
 
 This, I think, already helps a lot. If we are looking for a specific element, we can search the entire project for that element (replacing `__` with `-`), and we will always find that element and only that element. Additionally, at the bottom of every scss file (which should only ever contain one block), we have essentially created an index of what that file contains, which further improves orientation.
 
-We wrap that index in it’s own mixin three reasons:
+We wrap that index in its own mixin for three reasons:
 
 - Like with single elements, we can now disable the styles of the entire block by commenting out a single line of code (the last one). We have a single “hook” to control the entire block.
 - As all the other code now lives in mixins, it would be odd to not also put this in a mixin.
@@ -316,7 +316,7 @@ Let’s return to our initial example. We can now do this:
 
 ## Order of elements in the index
 
-- The order of the elements in the index should be the order they appear in the HTML structure.
+- The order of the elements in the index should be the order in which they appear in the HTML structure.
 - The order of the element mixins should be the same as in the index.
 
 Those two rules give no functional benefit, but help with orientation. I do not always strictly follow those two rules myself, but I try to follow them when I first write the block and its template.
@@ -361,7 +361,7 @@ The order of different types of stuff in an element mixin is defined, because a 
 }
 ```
 
-I do not usually enforce this strictly, and sometimes I do it different too. I think the most important one is #1. Including mixins go first because that mixin serves essentially as a template of the element we are writing here. The styles that come right after should be able to override whatever styles are set inside the mixin.
+I do not usually enforce this strictly, and sometimes I do it differently too. I think the most important one is #1. Including mixins go first because that mixin serves essentially as a template of the element we are writing here. The styles that come right after should be able to override whatever styles are set inside the mixin.
 
 I think we can all agree that styles should be as close to the top as possible, so they go second.
 
