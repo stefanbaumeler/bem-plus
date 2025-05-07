@@ -171,7 +171,7 @@ I think we have definitely improved the situation. When investigating an issue w
 
 For all of those reasons, I think this area is still in need of improvement.
 
-Both those sections get a 5/10 from me.
+Both those sections get a 5/10 each from me.
 
 ### Collaboration, Missing Standardization
 
@@ -191,6 +191,6 @@ The final score for BEM is 25/50. We solved half of our problems, so to speak. T
 
 The sane option would have been to abandon BEM and go look for a different system that solved all the problems mentioned in the previous post to their full extent. But I was a huge fan of BEM, and still am, so I didn’t have another choice. I had to figure out the other half of the bible myself. I started to experiment and I came up with a system on top of BEM. It is to BEM what Next.js is to React, so you could call it a meta methodology.
 
-I call it BEM+. I’m not known for my creativity.
+I call it BEM+. I’m not known for my creativity in naming things.
 
 In the next post, I will introduce BEM+ to you. This is where the really interesting part starts.
