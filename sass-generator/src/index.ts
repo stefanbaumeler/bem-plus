@@ -18,6 +18,6 @@ export class BemPlusSassGeneratorPlugin {
             generator.generate()
         }
 
-        compiler.hooks.afterEmit.tap('BEMPlus Sass Generator Plugin', callback)
+        compiler.hooks.afterEmit.tap('bem-plus Sass Generator Plugin', callback)
     }
 }

@@ -1,6 +1,6 @@
 # Part 3: bem-plus
 
-Even in the first post in this series, I have noted that styling problems are very different from selector problems. I think the separation is greater than most people realize. In fact, the styles and the selectors can be understood as two completely separate systems, and separating those two systems is a core part of BEMPlus.
+Even in the first post in this series, I have noted that styling problems are very different from selector problems. I think the separation is greater than most people realize. In fact, the styles and the selectors can be understood as two completely separate systems, and separating those two systems is a core part of bem-plus.
 
 So the first step is to take the styles of each element of a block, and put them into a mixin. The name of that mixin should always be `[block name]-[element name]`, or in the case of the block itself `[block name]-root`. We’ll also wrap the now bare selectors in another mixin, which we will include at the base level at the very bottom of the file. You might think that would cause chaos and confusion, but the opposite is the case. We just vastly simplified our structure, and each element now has a unique, easy to search for name.
 
@@ -378,13 +378,13 @@ This order also applies within modifiers, pseudo-elements and any other time you
 - The index should be the only place where you define selectors at the root level. Element mixins and mixins in general should only return styles and sub-selectors.
 - Do not use `@extend` / templates. Mixins do a better job in this situation and there’s no reason for them.
 
-## Speeding up writing BEMPlus code with live templates
+## Speeding up writing bem-plus code with live templates
 
 “There’s a lot more code I have to write now”, you might say, and you’d be correct with that assessment. This system is a bit more verbose than what we started with. But first of all, look at all the problems we solved with this system. Isn’t not having to deal with any of those problems ever again worth a couple extra lines of code?
 
 Secondly, look at what we’ve done so far. We have taken a bunch of code that does not follow any sort of pattern, and we have introduced a standardized, repetitive pattern that is always the same. The existence of such a pattern allows us to now automate certain parts of it.
 
-Most modern IDEs allow you to define live templates. We’ll define two of those, which will allow you to write the structure of a BEMPlus file much faster.
+Most modern IDEs allow you to define live templates. We’ll define two of those, which will allow you to write the structure of a bem-plus file much faster.
 
 ### Installation
 
@@ -428,7 +428,7 @@ Most modern IDEs allow you to define live templates. We’ll define two of those
     - `ELEMENT`: (leave empty)
     - `BLOCKNAME`: `regularExpression(fileNameWithoutExtension(), "_", "")`
 
-1. Save the settings.
+4. Save the settings.
 
 **VSCode**
 
@@ -437,11 +437,11 @@ Most modern IDEs allow you to define live templates. We’ll define two of those
 3. Add the following two snippets:
 
 ```json
-"BEMPlus tree": {
+"bem-plus tree": {
 		"prefix": "@tree",
 		"body": "@mixin ${TM_FILENAME_BASE}-root {\\n\\t$0\\n}\\n\\n@mixin ${TM_FILENAME_BASE} {\\n\\t.${TM_FILENAME_BASE} {\\n\\t\\t@include ${TM_FILENAME_BASE}-root;\\n\\t}\\n}\\n\\n@include ${TM_FILENAME_BASE};"
 	},
-	"BEMPlus element": {
+	"bem-plus element": {
 		"prefix": "&__",
 		"body": "&__${1} {\\n\\t@include ${TM_FILENAME_BASE}-${1};\\n}"
 	}
@@ -473,22 +473,22 @@ I don’t think that this can be improved further, thus, both of those sections 
 
 ### Collaboration
 
-With BEM and now BEMPlus we have introduced a standardized way of doing things. While with BEM there is still a lot of freedom on how to structure your code, with BEMPlus there is usually only one correct way to do things.
+With BEM and now bem-plus we have introduced a standardized way of doing things. While with BEM there is still a lot of freedom on how to structure your code, with bem-plus there is usually only one correct way to do things.
 
-BEMPlus is also very visible. It is clearly very different from standard CSS code. If you open a BEMPlus file, you can see at first glance that there’s a system here. If someone disregards this system and writes regular CSS code somewhere, this sticks out and is thus easy to detect.
+bem-plus is also very visible. It is clearly very different from standard CSS code. If you open a bem-plus file, you can see at first glance that there’s a system here. If someone disregards this system and writes regular CSS code somewhere, this sticks out and is thus easy to detect.
 
-There is no way yet to programmatically enforce the BEMPlus syntax, so this is not perfect yet.
+There is no way yet to programmatically enforce the bem-plus syntax, so this is not perfect yet.
 
-I think BEM has improved the situation for the most part, but I also think it got improved again by BEMPlus, so I’d give BEMPlus as it is today an 8/10.
+I think BEM has improved the situation for the most part, but I also think it got improved again by bem-plus, so I’d give bem-plus as it is today an 8/10.
 
 ### Missing Standardization
 
-Unlike BEM, with BEMPlus we now have a highly standardized structure. It is so standardized in fact, that we can now use those scss files to derive useful information: What blocks exist in this application? What elements do belong to this block?
+Unlike BEM, with bem-plus we now have a highly standardized structure. It is so standardized in fact, that we can now use those scss files to derive useful information: What blocks exist in this application? What elements do belong to this block?
 
 This information is super easy to obtain: Just have a look at the index! That information is not only useful for us as developers, it is also useful to generate stuff. And that’s exactly what the final part of our long journy will be about.
 
-The fact that we can now even consider such a thing means that our code is now highly standardized. As such, BEMPlus gets a score of 10/10 from me for standardization.
+The fact that we can now even consider such a thing means that our code is now highly standardized. As such, bem-plus gets a score of 10/10 from me for standardization.
 
 This leads to a final score of 48/50. I might be biased.
 
-I’m still thinking about those final two points, though. I think there’s a way, but I have not fleshed it out yet. For now, let’s have a look at how we can profit from BEMPlus beyond CSS.
+I’m still thinking about those final two points, though. I think there’s a way, but I have not fleshed it out yet. For now, let’s have a look at how we can profit from bem-plus beyond CSS.
