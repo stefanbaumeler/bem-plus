@@ -1,6 +1,7 @@
 import { indent, angleType, colonType } from '../../helpers'
 
 export const moduleTemplate = ({
+    type,
     isTypeScript,
     className,
     elementProperties,
@@ -11,6 +12,7 @@ export const moduleTemplate = ({
     prefix = '',
     suffix = ''
 }: {
+    type: string
     isTypeScript: boolean
     className: string
     elementProperties: string
@@ -32,7 +34,7 @@ export class ${className} extends BemPlusModule {
 
     ${indent(elementProperties, 1)}
     constructor(rootElement${colonType('Element', isTypeScript)}) {
-        super(${angleType('HTMLElement', isTypeScript)}rootElement)
+        super(${angleType(type, isTypeScript)}rootElement)
 
         ${rootReference}
 

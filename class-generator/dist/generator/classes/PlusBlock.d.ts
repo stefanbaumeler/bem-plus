@@ -8,6 +8,7 @@ export declare class PlusBlock extends Block {
         element: (block: string) => RegExp;
         hasIndex: (block: string) => RegExp;
         hasAnElement: (block: string) => RegExp;
+        rootProps: (block: string) => RegExp;
     };
     allModifiers: string[];
     constructor({ config, inputPath, allModifiers }: {

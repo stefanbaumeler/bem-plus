@@ -13,7 +13,8 @@ export class PlusBlock extends Block {
         removeComments: (input: string) => input.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, ''),
         element: (block: string) => new RegExp(`(?<=&${this.config.input.separators.element})[^\\s{(]*(?=.*\\r?\\n.*@include ${block}${this.config.input.separators.mixinElement})`, 'g'),
         hasIndex: (block: string) => new RegExp(`@mixin ${block}[^.-]*\\.${block} {`),
-        hasAnElement: (block: string) => new RegExp(`@mixin ${block}${this.config.input.separators.mixinElement}.*`)
+        hasAnElement: (block: string) => new RegExp(`@mixin ${block}${this.config.input.separators.mixinElement}.*`),
+        rootProps: (block: string) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}root\\s*\\()[^)]*`, 'g')
     }
 
     allModifiers: string[]
@@ -55,7 +56,11 @@ export class PlusBlock extends Block {
 
         if (this.verifyFileIsBlock()) {
             this.getElements()
-            this.generateModule()
+
+            const rootElement = this.elements.find((el) => el.name === 'root')
+            rootElement?.props.type
+
+            this.generateModule(rootElement?.props.type)
         }
     }
 

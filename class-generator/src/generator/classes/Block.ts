@@ -15,18 +15,21 @@ export class Block {
     module = ''
     importExport = ''
     autoloader = ''
+
     constructor(public config: TBemPlusClassGeneratorConfigOutput, public name = '') {}
 
-    generateModule() {
+    generateModule(rootType = 'HTMLElement') {
         const isTypeScript = this.config.output.language === EOutputLanguage.ts
 
         const rootReference = rootReferenceTemplate({
+            type: rootType,
             isTypeScript,
             className: pascal(this.name)
         })
 
         const elementTemplates = this.elements.map((element) => element.generateTemplates(this.name, isTypeScript))
         this.module = moduleTemplate({
+            type: rootType,
             isTypeScript,
             elementClasses: elementTemplates.map((templateGroup) => templateGroup.class).join('\n'),
             elementProperties: elementTemplates.map((templateGroup) => templateGroup.property).filter((prop) => prop.length).join('\n'),
