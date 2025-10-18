@@ -2035,9 +2035,15 @@ __webpack_require__.d(__webpack_exports__, {
 });
 /* harmony import */var _helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../helpers */ "./src/helpers.ts");
 
-const elementReferenceTemplate = ({ isTypeScript, className, block, element, separators }) => element.props.single
-    ? `this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = new ${className}(this.root.el.querySelector${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')${isTypeScript ? '!' : ''})`
-    : `this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = [...this.root.el.querySelectorAll${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el))`;
+const elementReferenceTemplate = ({ isTypeScript, className, block, element, separators }) => {
+    if (element.props.single) {
+        const selector = `this.root.el.querySelector${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')`;
+        return `
+const ${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = ${selector};
+this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = ${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} ? new ${className}(${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)}) : undefined`;
+    }
+    return `this.${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.camel)(element.escapedName)} = [...this.root.el.querySelectorAll${(0,_helpers__WEBPACK_IMPORTED_MODULE_0__.angleType)(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el))`;
+};
 
 
 }),
