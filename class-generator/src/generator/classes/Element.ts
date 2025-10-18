@@ -1,4 +1,4 @@
-import { TBemPlusClassGeneratorConfigOutput } from '../schema'
+import { TBemPlusClassGeneratorProjectConfig } from '../schema'
 import { camel, pascal, unique } from '../../helpers'
 import { modifierTemplate } from '../templates/modifier'
 import { elementClassTemplate } from '../templates/elementClass'
@@ -30,7 +30,7 @@ export class Element {
     constructor({
         config, name, blockName, allModifiers, context
     }: {
-        config: TBemPlusClassGeneratorConfigOutput
+        config: TBemPlusClassGeneratorProjectConfig
         name: string
         blockName: string
         allModifiers: string[]

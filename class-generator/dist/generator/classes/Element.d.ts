@@ -1,31 +1,6 @@
-import { TBemPlusClassGeneratorConfigOutput } from '../schema';
+import { TBemPlusClassGeneratorProjectConfig } from '../schema';
 export declare class Element {
-    config: {
-        input: {
-            include: string[];
-            exclude: string[];
-            excludeBlocks: string[];
-            rootMixinSuffix: string;
-            separators: {
-                element: string;
-                modifier: string;
-                mixinElement: string;
-            };
-        };
-        output: {
-            filename: (args_0: string, args_1: string, ...args_2: unknown[]) => string;
-            path: string;
-            prefix: string;
-            language: "js" | "ts";
-            autoloader: boolean;
-            mode: "absolute" | "relative";
-            suffix: string;
-            elementClass: (args_0: string, ...args_1: unknown[]) => string;
-            moduleClass: (args_0: string, ...args_1: unknown[]) => string;
-            onComplete: (...args: unknown[]) => unknown;
-        };
-        strategy: "dist" | "plus";
-    };
+    config: TBemPlusClassGeneratorProjectConfig;
     name: string;
     escapedName: string;
     selector: string;
@@ -41,7 +16,7 @@ export declare class Element {
         invalidFirstCharacter: RegExp;
     };
     constructor({ config, name, blockName, allModifiers, context }: {
-        config: TBemPlusClassGeneratorConfigOutput;
+        config: TBemPlusClassGeneratorProjectConfig;
         name: string;
         blockName: string;
         allModifiers: string[];

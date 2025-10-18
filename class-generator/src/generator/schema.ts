@@ -6,7 +6,7 @@ const defaults = {
     input: {
         include: ['**/*.{scss,sass}'],
         exclude: ['node_modules/**'],
-        excludeBlocks: [],
+        excludeBlocks: [] as string[],
         rootMixinSuffix: 'root',
         separators: {
             element: '__',
@@ -16,8 +16,8 @@ const defaults = {
     },
     output: {
         autoloader: false,
-        language: EOutputLanguage.ts,
-        mode: EOutputMode.absolute,
+        language: EOutputLanguage.ts as 'ts' | 'js',
+        mode: EOutputMode.absolute as 'relative' | 'absolute',
         path: './.bem-plus',
         filename: (blockName: string, fileType: string) => `${blockName}.generated.${fileType}`,
         prefix: '',
@@ -28,32 +28,63 @@ const defaults = {
     }
 }
 
-export const BemPlusClassGeneratorConfig = z.object({
-    strategy: z.enum(['plus', 'dist']),
-    input: z.object({
-        include: z.array(z.string()).default(defaults.input.include),
-        exclude: z.array(z.string()).default(defaults.input.exclude),
-        excludeBlocks: z.array(z.string()).default(defaults.input.excludeBlocks),
-        rootMixinSuffix: z.string().default(defaults.input.rootMixinSuffix),
-        separators: z.object({
-            element: z.string().default(defaults.input.separators.element),
-            modifier: z.string().default(defaults.input.separators.modifier),
-            mixinElement: z.string().default(defaults.input.separators.mixinElement)
-        }).default(defaults.input.separators)
-    }).default(defaults.input),
-    output: z.object({
-        autoloader: z.boolean().default(defaults.output.autoloader),
-        language: z.enum(['js', 'ts']).default(defaults.output.language),
-        mode: z.enum(['relative', 'absolute']).default(defaults.output.mode),
-        path: z.string().default(defaults.output.path),
-        filename: z.function().args(z.string(), z.string()).returns(z.string()).default(() => defaults.output.filename),
-        prefix: z.string().default(defaults.output.prefix),
-        suffix: z.string().default(defaults.output.suffix),
-        elementClass: z.function().args(z.string()).returns(z.string()).default(() => defaults.output.elementClass),
-        moduleClass: z.function().args(z.string()).returns(z.string()).default(() => defaults.output.moduleClass),
-        onComplete: z.function().default(() => defaults.output.onComplete)
-    }).default(defaults.output)
-}).default(defaults)
+const SeparatorsSchema = z.object({
+    element: z.string().optional(),
+    modifier: z.string().optional(),
+    mixinElement: z.string().optional()
+})
 
-export type TBemPlusClassGeneratorConfigInput = z.input<typeof BemPlusClassGeneratorConfig>
-export type TBemPlusClassGeneratorConfigOutput = z.output<typeof BemPlusClassGeneratorConfig>
+const InputSchema = z.object({
+    include: z.array(z.string()).optional(),
+    exclude: z.array(z.string()).optional(),
+    excludeBlocks: z.array(z.string()).optional(),
+    rootMixinSuffix: z.string().optional(),
+    separators: SeparatorsSchema.optional()
+})
+
+const OutputSchema = z.object({
+    autoloader: z.boolean().optional(),
+    language: z.union([z.literal('js'), z.literal('ts')]).optional(),
+    mode: z.union([z.literal('relative'), z.literal('absolute')]).optional(),
+    path: z.string().optional(),
+    filename: z.function().args(z.string(), z.string()).returns(z.string()).optional(),
+    prefix: z.string().optional(),
+    suffix: z.string().optional(),
+    elementClass: z.function().args(z.string()).returns(z.string()).optional(),
+    moduleClass: z.function().args(z.string()).returns(z.string()).optional(),
+    onComplete: z.function().optional()
+})
+
+export const BemPlusClassGeneratorConfig = z.array(z.object({
+    strategy: z.union([z.literal('plus'), z.literal('dist')]).optional(),
+    input: InputSchema.optional(),
+    output: OutputSchema.optional()
+}))
+
+export type TBemPlusClassGeneratorInputConfig = z.input<typeof BemPlusClassGeneratorConfig>
+
+export type TBemPlusClassGeneratorProjectConfig = {
+    strategy: typeof defaults.strategy
+    input: typeof defaults.input
+    output: typeof defaults.output
+}
+
+export function parseConfig(config: unknown): TBemPlusClassGeneratorProjectConfig[] {
+    const parsed = BemPlusClassGeneratorConfig.parse(config)
+
+    return parsed.map((cfg) => ({
+        strategy: (cfg.strategy ?? defaults.strategy) as EStrategy,
+        input: {
+            ...defaults.input,
+            ...cfg.input,
+            separators: {
+                ...defaults.input.separators,
+                ...cfg.input?.separators
+            }
+        },
+        output: {
+            ...defaults.output,
+            ...cfg.output
+        }
+    }))
+}

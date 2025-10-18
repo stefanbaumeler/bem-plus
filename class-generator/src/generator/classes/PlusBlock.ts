@@ -1,7 +1,7 @@
 import path from 'node:path'
 import fs from 'fs'
 import { EOutputMode } from '../types'
-import { TBemPlusClassGeneratorConfigOutput } from '../schema'
+import { TBemPlusClassGeneratorProjectConfig } from '../schema'
 import { Element } from './Element'
 import { Block } from './Block'
 import { getFileContents } from '../../helpers'
@@ -22,7 +22,7 @@ export class PlusBlock extends Block {
     constructor({
         config, inputPath, allModifiers
     }: {
-        config: TBemPlusClassGeneratorConfigOutput
+        config: TBemPlusClassGeneratorProjectConfig
         inputPath: string
         allModifiers: string[]
     }) {

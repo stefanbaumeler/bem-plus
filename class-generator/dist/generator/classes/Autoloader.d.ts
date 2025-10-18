@@ -1,11 +1,11 @@
 import { Block } from './Block';
-import { TBemPlusClassGeneratorConfigOutput } from '../schema';
+import { TBemPlusClassGeneratorProjectConfig } from '../schema';
 export declare class Autoloader {
-    config: TBemPlusClassGeneratorConfigOutput;
+    config: TBemPlusClassGeneratorProjectConfig;
     blocks: Block[];
     matchers: {
         export: RegExp;
     };
-    constructor(config: TBemPlusClassGeneratorConfigOutput, blocks: Block[]);
+    constructor(config: TBemPlusClassGeneratorProjectConfig, blocks: Block[]);
     write(): Promise<void>;
 }

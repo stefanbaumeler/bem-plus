@@ -1,4 +1,4 @@
-import { TBemPlusClassGeneratorConfigOutput } from './schema'
+import { TBemPlusClassGeneratorProjectConfig } from './schema'
 import { glob } from 'glob'
 import { EOutputMode, EStrategy } from './types'
 import path from 'node:path'
@@ -12,6 +12,7 @@ import { InvalidSeparatorError } from './errors/InvalidSeparatorError'
 import { Autoloader } from './classes/Autoloader'
 
 export class BemPlusClassGenerator {
+    distPath = ''
     blocks: Block[] = []
     matchers = {
         bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
@@ -24,11 +25,12 @@ export class BemPlusClassGenerator {
         subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^ ),:>+~.#[|\\s]*`, 'g')
     }
 
-    constructor(public config: TBemPlusClassGeneratorConfigOutput, public distPath: string) {
+    constructor(public config: TBemPlusClassGeneratorProjectConfig) {
         this.validateSeparators()
     }
 
-    async generate() {
+    async generate(distPath: string) {
+        this.distPath = distPath
         this.blocks = this.config.strategy === EStrategy.plus ? await this.getPlusBlocks() : await this.getDistBlocks()
 
         await this.initBlocks()

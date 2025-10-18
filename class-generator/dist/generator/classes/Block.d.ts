@@ -1,14 +1,14 @@
-import { TBemPlusClassGeneratorConfigOutput } from '../schema';
+import { TBemPlusClassGeneratorProjectConfig } from '../schema';
 import { Element } from './Element';
 export declare class Block {
-    config: TBemPlusClassGeneratorConfigOutput;
+    config: TBemPlusClassGeneratorProjectConfig;
     name: string;
     elements: Element[];
     output: string;
     module: string;
     importExport: string;
     autoloader: string;
-    constructor(config: TBemPlusClassGeneratorConfigOutput, name?: string);
+    constructor(config: TBemPlusClassGeneratorProjectConfig, name?: string);
     generateModule(rootType?: string): void;
     setImportExport(): void;
     setAutoloader(): Promise<void>;

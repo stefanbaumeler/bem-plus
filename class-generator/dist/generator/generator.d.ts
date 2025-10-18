@@ -1,8 +1,8 @@
-import { TBemPlusClassGeneratorConfigOutput } from './schema';
+import { TBemPlusClassGeneratorProjectConfig } from './schema';
 import { PlusBlock } from './classes/PlusBlock';
 import { Block } from './classes/Block';
 export declare class BemPlusClassGenerator {
-    config: TBemPlusClassGeneratorConfigOutput;
+    config: TBemPlusClassGeneratorProjectConfig;
     distPath: string;
     blocks: Block[];
     matchers: {
@@ -15,8 +15,8 @@ export declare class BemPlusClassGenerator {
         ampModifier: RegExp;
         subModifier: RegExp;
     };
-    constructor(config: TBemPlusClassGeneratorConfigOutput, distPath: string);
-    generate(): Promise<void>;
+    constructor(config: TBemPlusClassGeneratorProjectConfig);
+    generate(distPath: string): Promise<void>;
     initBlocks(): Promise<void>;
     writeModules(): Promise<void>;
     getPlusBlocks(): Promise<PlusBlock[]>;

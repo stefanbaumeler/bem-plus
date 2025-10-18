@@ -1,4 +1,4 @@
-import { TBemPlusClassGeneratorConfigOutput } from '../schema';
+import { TBemPlusClassGeneratorProjectConfig } from '../schema';
 import { Block } from './Block';
 export declare class PlusBlock extends Block {
     input: string;
@@ -12,7 +12,7 @@ export declare class PlusBlock extends Block {
     };
     allModifiers: string[];
     constructor({ config, inputPath, allModifiers }: {
-        config: TBemPlusClassGeneratorConfigOutput;
+        config: TBemPlusClassGeneratorProjectConfig;
         inputPath: string;
         allModifiers: string[];
     });

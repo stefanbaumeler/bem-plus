@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { TBemPlusClassGeneratorConfigOutput } from '../schema'
+import { TBemPlusClassGeneratorProjectConfig } from '../schema'
 import { Element } from './Element'
 import { Block } from './Block'
 
@@ -7,7 +7,7 @@ export class DistBlock extends Block {
     constructor({
         config, name, elementStrings, allModifiers
     }: {
-        config: TBemPlusClassGeneratorConfigOutput
+        config: TBemPlusClassGeneratorProjectConfig
         name: string
         elementStrings: string[]
         allModifiers: string[]

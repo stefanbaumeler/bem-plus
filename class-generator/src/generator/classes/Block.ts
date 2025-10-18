@@ -1,7 +1,7 @@
 import { moduleTemplate } from '../templates/module'
 import { getFileContents, pascal } from '../../helpers'
 import { EOutputLanguage } from '../types'
-import { TBemPlusClassGeneratorConfigOutput } from '../schema'
+import { TBemPlusClassGeneratorProjectConfig } from '../schema'
 import { rootReferenceTemplate } from '../templates/rootReference'
 import { Element } from './Element'
 import fs from 'fs'
@@ -16,7 +16,7 @@ export class Block {
     importExport = ''
     autoloader = ''
 
-    constructor(public config: TBemPlusClassGeneratorConfigOutput, public name = '') {}
+    constructor(public config: TBemPlusClassGeneratorProjectConfig, public name = '') {}
 
     generateModule(rootType = 'HTMLElement') {
         const isTypeScript = this.config.output.language === EOutputLanguage.ts

@@ -1,20 +1,38 @@
 import {
-    BemPlusClassGeneratorConfig,
-    TBemPlusClassGeneratorConfigInput,
-    TBemPlusClassGeneratorConfigOutput
+    BemPlusClassGeneratorConfig, parseConfig,
+    TBemPlusClassGeneratorInputConfig,
+    TBemPlusClassGeneratorProjectConfig
 } from './generator/schema'
 import { BemPlusClassGenerator } from './generator/generator'
+import { BemPlusClassGeneratorProject } from './BemPlusClassGeneratorProject'
+import type { Compiler, Compilation } from 'webpack'
 
 export class BemPlusClassGeneratorPlugin {
-    options: TBemPlusClassGeneratorConfigOutput
-    constructor(options: TBemPlusClassGeneratorConfigInput) {
-        this.options = BemPlusClassGeneratorConfig.parse(options)
+    projects: {
+        project: BemPlusClassGeneratorProject
+        generator: BemPlusClassGenerator
+    }[]
+    options: TBemPlusClassGeneratorProjectConfig[]
+    constructor(options: TBemPlusClassGeneratorInputConfig) {
+        this.options = parseConfig(BemPlusClassGeneratorConfig.parse(options))
+
+        this.projects = this.options.map((cfg) => {
+            return {
+                project: new BemPlusClassGeneratorProject(cfg),
+                generator: new BemPlusClassGenerator(cfg)
+            }
+        })
     }
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    apply(compiler: any) {
-        const callback = () => {
-            const generator = new BemPlusClassGenerator(this.options, compiler.outputPath)
-            generator.generate()
+
+    apply(compiler: Compiler) {
+        const callback = (compilation: Compilation) => {
+            this.projects.forEach((project) => {
+                const changed = project.project.getChangedFiles(compilation)
+
+                if (changed.length) {
+                    project.generator.generate(compiler.outputPath)
+                }
+            })
         }
 
         compiler.hooks.afterEmit.tap('@bem-plus/class-generator plugin', callback)

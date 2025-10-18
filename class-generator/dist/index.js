@@ -1159,6 +1159,54 @@ module.exports = {
 
 
 }),
+"./src/BemPlusClassGeneratorProject.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  BemPlusClassGeneratorProject: function() { return BemPlusClassGeneratorProject; }
+});
+/* harmony import */var path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! path */ "path");
+/* harmony import */var path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */var fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */var glob__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! glob */ "./node_modules/glob/dist/esm/index.js");
+
+
+
+class BemPlusClassGeneratorProject {
+    constructor(config) {
+        this.config = config;
+        this.prevTimestamps = new Map();
+        this.getChangedFiles = (compilation) => {
+            const changedFiles = [];
+            const watchedFiles = new Set();
+            for (const pattern of this.config.input.include) {
+                const matches = glob__WEBPACK_IMPORTED_MODULE_2__.glob.sync(pattern, {
+                    absolute: true
+                });
+                matches.forEach((f) => watchedFiles.add(path__WEBPACK_IMPORTED_MODULE_0___default().resolve(f)));
+            }
+            if (compilation.fileDependencies) {
+                for (const file of compilation.fileDependencies) {
+                    if (!watchedFiles.has(path__WEBPACK_IMPORTED_MODULE_0___default().resolve(file))) {
+                        continue;
+                    }
+                    const prevTime = this.prevTimestamps.get(file);
+                    const stat = fs__WEBPACK_IMPORTED_MODULE_1___default().existsSync(file) ? fs__WEBPACK_IMPORTED_MODULE_1___default().statSync(file) : null;
+                    const mtime = stat ? stat.mtimeMs : Infinity;
+                    this.prevTimestamps.set(file, mtime);
+                    if (!prevTime || prevTime < mtime) {
+                        changedFiles.push(file);
+                    }
+                }
+            }
+            return changedFiles;
+        };
+    }
+}
+
+
+}),
 "./src/generator/classes/Autoloader.ts": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -1710,9 +1758,9 @@ __webpack_require__.d(__webpack_exports__, {
 
 
 class BemPlusClassGenerator {
-    constructor(config, distPath) {
+    constructor(config) {
         this.config = config;
-        this.distPath = distPath;
+        this.distPath = '';
         this.blocks = [];
         this.matchers = {
             bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
@@ -1726,7 +1774,8 @@ class BemPlusClassGenerator {
         };
         this.validateSeparators();
     }
-    async generate() {
+    async generate(distPath) {
+        this.distPath = distPath;
         this.blocks = this.config.strategy === _types__WEBPACK_IMPORTED_MODULE_1__.EStrategy.plus ? await this.getPlusBlocks() : await this.getDistBlocks();
         await this.initBlocks();
         await this.writeModules();
@@ -1851,7 +1900,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-  BemPlusClassGeneratorConfig: function() { return BemPlusClassGeneratorConfig; }
+  BemPlusClassGeneratorConfig: function() { return BemPlusClassGeneratorConfig; },
+  parseConfig: function() { return parseConfig; }
 });
 /* harmony import */var zod__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! zod */ "./node_modules/zod/lib/index.mjs");
 /* harmony import */var _types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./types */ "./src/generator/types.ts");
@@ -1883,32 +1933,56 @@ const defaults = {
         onComplete: () => { }
     }
 };
-const BemPlusClassGeneratorConfig = zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
-    strategy: zod__WEBPACK_IMPORTED_MODULE_1__.z["enum"](['plus', 'dist']),
-    input: zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
-        include: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(defaults.input.include),
-        exclude: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(defaults.input.exclude),
-        excludeBlocks: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(defaults.input.excludeBlocks),
-        rootMixinSuffix: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.input.rootMixinSuffix),
-        separators: zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
-            element: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.input.separators.element),
-            modifier: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.input.separators.modifier),
-            mixinElement: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.input.separators.mixinElement)
-        }).default(defaults.input.separators)
-    }).default(defaults.input),
-    output: zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
-        autoloader: zod__WEBPACK_IMPORTED_MODULE_1__.z.boolean().default(defaults.output.autoloader),
-        language: zod__WEBPACK_IMPORTED_MODULE_1__.z["enum"](['js', 'ts']).default(defaults.output.language),
-        mode: zod__WEBPACK_IMPORTED_MODULE_1__.z["enum"](['relative', 'absolute']).default(defaults.output.mode),
-        path: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.output.path),
-        filename: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().args(zod__WEBPACK_IMPORTED_MODULE_1__.z.string(), zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).returns(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(() => defaults.output.filename),
-        prefix: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.output.prefix),
-        suffix: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().default(defaults.output.suffix),
-        elementClass: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().args(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).returns(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(() => defaults.output.elementClass),
-        moduleClass: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().args(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).returns(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).default(() => defaults.output.moduleClass),
-        onComplete: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().default(() => defaults.output.onComplete)
-    }).default(defaults.output)
-}).default(defaults);
+const SeparatorsSchema = zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
+    element: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().optional(),
+    modifier: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().optional(),
+    mixinElement: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().optional()
+});
+const InputSchema = zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
+    include: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).optional(),
+    exclude: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).optional(),
+    excludeBlocks: zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).optional(),
+    rootMixinSuffix: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().optional(),
+    separators: SeparatorsSchema.optional()
+});
+const OutputSchema = zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
+    autoloader: zod__WEBPACK_IMPORTED_MODULE_1__.z.boolean().optional(),
+    language: zod__WEBPACK_IMPORTED_MODULE_1__.z.union([zod__WEBPACK_IMPORTED_MODULE_1__.z.literal('js'), zod__WEBPACK_IMPORTED_MODULE_1__.z.literal('ts')]).optional(),
+    mode: zod__WEBPACK_IMPORTED_MODULE_1__.z.union([zod__WEBPACK_IMPORTED_MODULE_1__.z.literal('relative'), zod__WEBPACK_IMPORTED_MODULE_1__.z.literal('absolute')]).optional(),
+    path: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().optional(),
+    filename: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().args(zod__WEBPACK_IMPORTED_MODULE_1__.z.string(), zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).returns(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).optional(),
+    prefix: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().optional(),
+    suffix: zod__WEBPACK_IMPORTED_MODULE_1__.z.string().optional(),
+    elementClass: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().args(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).returns(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).optional(),
+    moduleClass: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().args(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).returns(zod__WEBPACK_IMPORTED_MODULE_1__.z.string()).optional(),
+    onComplete: zod__WEBPACK_IMPORTED_MODULE_1__.z["function"]().optional()
+});
+const BemPlusClassGeneratorConfig = zod__WEBPACK_IMPORTED_MODULE_1__.z.array(zod__WEBPACK_IMPORTED_MODULE_1__.z.object({
+    strategy: zod__WEBPACK_IMPORTED_MODULE_1__.z.union([zod__WEBPACK_IMPORTED_MODULE_1__.z.literal('plus'), zod__WEBPACK_IMPORTED_MODULE_1__.z.literal('dist')]).optional(),
+    input: InputSchema.optional(),
+    output: OutputSchema.optional()
+}));
+function parseConfig(config) {
+    const parsed = BemPlusClassGeneratorConfig.parse(config);
+    return parsed.map((cfg) => {
+        var _a, _b;
+        return ({
+            strategy: ((_a = cfg.strategy) !== null && _a !== void 0 ? _a : defaults.strategy),
+            input: {
+                ...defaults.input,
+                ...cfg.input,
+                separators: {
+                    ...defaults.input.separators,
+                    ...(_b = cfg.input) === null || _b === void 0 ? void 0 : _b.separators
+                }
+            },
+            output: {
+                ...defaults.output,
+                ...cfg.output
+            }
+        });
+    });
+}
 
 
 }),
@@ -2175,6 +2249,11 @@ module.exports = require("node:url");
 "os": (function (module) {
 "use strict";
 module.exports = require("os");
+
+}),
+"path": (function (module) {
+"use strict";
+module.exports = require("path");
 
 }),
 "util": (function (module) {
@@ -14516,17 +14595,28 @@ __webpack_require__.d(__webpack_exports__, {
 });
 /* harmony import */var _generator_schema__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./generator/schema */ "./src/generator/schema.ts");
 /* harmony import */var _generator_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./generator/generator */ "./src/generator/generator.ts");
+/* harmony import */var _BemPlusClassGeneratorProject__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BemPlusClassGeneratorProject */ "./src/BemPlusClassGeneratorProject.ts");
+
 
 
 class BemPlusClassGeneratorPlugin {
     constructor(options) {
-        this.options = _generator_schema__WEBPACK_IMPORTED_MODULE_0__.BemPlusClassGeneratorConfig.parse(options);
+        this.options = (0,_generator_schema__WEBPACK_IMPORTED_MODULE_0__.parseConfig)(_generator_schema__WEBPACK_IMPORTED_MODULE_0__.BemPlusClassGeneratorConfig.parse(options));
+        this.projects = this.options.map((cfg) => {
+            return {
+                project: new _BemPlusClassGeneratorProject__WEBPACK_IMPORTED_MODULE_2__.BemPlusClassGeneratorProject(cfg),
+                generator: new _generator_generator__WEBPACK_IMPORTED_MODULE_1__.BemPlusClassGenerator(cfg)
+            };
+        });
     }
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     apply(compiler) {
-        const callback = () => {
-            const generator = new _generator_generator__WEBPACK_IMPORTED_MODULE_1__.BemPlusClassGenerator(this.options, compiler.outputPath);
-            generator.generate();
+        const callback = (compilation) => {
+            this.projects.forEach((project) => {
+                const changed = project.project.getChangedFiles(compilation);
+                if (changed.length) {
+                    project.generator.generate(compiler.outputPath);
+                }
+            });
         };
         compiler.hooks.afterEmit.tap('@bem-plus/class-generator plugin', callback);
     }
