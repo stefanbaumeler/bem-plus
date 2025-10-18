@@ -1,6 +1,6 @@
 export enum EOutputMode {
     absolute = 'absolute',
-    relative = 'relative',
+    relative = 'relative'
 }
 
 export type TSeparators = {

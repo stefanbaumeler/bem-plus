@@ -9,5 +9,5 @@ export declare class BemPlusClassGeneratorPlugin {
     }[];
     options: TBemPlusClassGeneratorProjectConfig[];
     constructor(options: TBemPlusClassGeneratorInputConfig);
-    apply(compiler: Compiler): void;
+    apply: (compiler: Compiler) => void;
 }

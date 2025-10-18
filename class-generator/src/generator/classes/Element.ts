@@ -16,8 +16,8 @@ export class Element {
     props: {
         [key: string]: string
     } = {
-            type: 'HTMLElement'
-        }
+        type: 'HTMLElement'
+    }
     modifiers: {
         name: string
         escaped: boolean
@@ -27,7 +27,7 @@ export class Element {
         invalidFirstCharacter: new RegExp('^[\\d-].*', 'g')
     }
 
-    constructor({
+    constructor ({
         config, name, blockName, allModifiers, context
     }: {
         config: TBemPlusClassGeneratorProjectConfig
@@ -46,8 +46,7 @@ export class Element {
         if ((name.match(this.matchers.invalidFirstCharacter) || []).length) {
             console.warn(messages.numericElement(blockName, name))
             this.escapedName = `_${name}`
-        }
-        else {
+        } else {
             this.escapedName = name
         }
 
@@ -87,7 +86,7 @@ export class Element {
         }
     }
 
-    getProps(context: string, blockName: string) {
+    getProps = (context: string, blockName: string) => {
         const match = context.match(this.matchers.elementProps(blockName, this.name))
         const props: { [key: string]: string } = {}
 
@@ -105,7 +104,7 @@ export class Element {
         }
     }
 
-    generateTemplates(block: string, isTypeScript: boolean) {
+    generateTemplates = (block: string, isTypeScript: boolean) => {
         const modifierProperties = this.modifiers.map((modifier) => {
             return modifierTemplate({
                 modifier: `${modifier.escaped ? '_' : ''}${camel(modifier.name)}`,
@@ -114,7 +113,7 @@ export class Element {
             })
         })
 
-        const className =  this.config.output.elementClass(pascal(block, this.name))
+        const className = this.config.output.elementClass(pascal(block, this.name))
 
         const args = Object.entries(this.props).filter(([key]) => !['type', 'single'].includes(key)).map(([key, value]) => elementArgumentTemplate({
             key,

@@ -16,7 +16,7 @@ export class Block {
         element: (block: string) => new RegExp(`(?<=${block}${this.config.output.separators.element}).*?(?=(--)|["'\\s])`, 'g')
     }
 
-    constructor({
+    constructor ({
         config, inputPath, input, template
     }: {
         config: TBemPlusSassGeneratorConfigOutput
@@ -41,12 +41,12 @@ export class Block {
         }))
     }
 
-    async update() {
+    async update () {
         const elementMixins = this.elements.map((element) => element.mixin).join('\n\n')
         const index = this.generateIndex()
         const full = `@use '@bem-plus';\n\n${elementMixins}\n\n${index}\n`
 
-        console.log(full)
+        // console.log(full)
 
         if (full !== this.input) {
             await fs.promises.writeFile(this.inputPath, full, {
@@ -55,7 +55,7 @@ export class Block {
         }
     }
 
-    generateIndex() {
+    generateIndex () {
         return indexTemplate({
             block: this.name,
             elements: this.elements,

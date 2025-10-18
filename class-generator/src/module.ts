@@ -5,9 +5,10 @@ export class BemPlusModule<TRoot extends Element | HTMLElement = HTMLElement> {
 
     index = 0
 
-    refresh = () => {}
+    refresh = () => {
+    }
 
-    constructor(rootElement: TRoot, k?: number) {
+    constructor (rootElement: TRoot, k?: number) {
         if (k) {
             this.index = k
         }

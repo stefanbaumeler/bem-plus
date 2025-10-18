@@ -4,27 +4,27 @@ import {
     TBemPlusClassGeneratorProjectConfig
 } from './generator/schema'
 import { BemPlusClassGenerator } from './generator/generator'
-import { BemPlusClassGeneratorProject } from './BemPlusClassGeneratorProject'
+import { Project } from './generator/classes/Project'
 import type { Compiler, Compilation } from 'webpack'
 
 export class BemPlusClassGeneratorPlugin {
     projects: {
-        project: BemPlusClassGeneratorProject
+        project: Project
         generator: BemPlusClassGenerator
     }[]
     options: TBemPlusClassGeneratorProjectConfig[]
-    constructor(options: TBemPlusClassGeneratorInputConfig) {
+    constructor (options: TBemPlusClassGeneratorInputConfig) {
         this.options = parseConfig(BemPlusClassGeneratorConfig.parse(options))
 
         this.projects = this.options.map((cfg) => {
             return {
-                project: new BemPlusClassGeneratorProject(cfg),
+                project: new Project(cfg),
                 generator: new BemPlusClassGenerator(cfg)
             }
         })
     }
 
-    apply(compiler: Compiler) {
+    apply = (compiler: Compiler) => {
         const callback = (compilation: Compilation) => {
             this.projects.forEach((project) => {
                 const changed = project.project.getChangedFiles(compilation)

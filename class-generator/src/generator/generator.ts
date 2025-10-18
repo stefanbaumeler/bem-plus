@@ -25,11 +25,11 @@ export class BemPlusClassGenerator {
         subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^ ),:>+~.#[|\\s]*`, 'g')
     }
 
-    constructor(public config: TBemPlusClassGeneratorProjectConfig) {
+    constructor (public config: TBemPlusClassGeneratorProjectConfig) {
         this.validateSeparators()
     }
 
-    async generate(distPath: string) {
+    generate = async (distPath: string) => {
         this.distPath = distPath
         this.blocks = this.config.strategy === EStrategy.plus ? await this.getPlusBlocks() : await this.getDistBlocks()
 
@@ -52,17 +52,17 @@ export class BemPlusClassGenerator {
         this.config.output.onComplete()
     }
 
-    async initBlocks() {
+    initBlocks = async () => {
         const initPromises = this.blocks.map((block) => block.init())
         await Promise.all(initPromises)
     }
 
-    async writeModules() {
+    writeModules = async () => {
         const writePromises = this.blocks.map((block) => block.writeModule())
         await Promise.all(writePromises)
     }
 
-    async getPlusBlocks() {
+    getPlusBlocks = async () => {
         const filePaths = await glob(this.config.input.include, {
             ignore: this.config.input.exclude
         })
@@ -76,7 +76,7 @@ export class BemPlusClassGenerator {
         }))
     }
 
-    async getDistBlocks(): Promise<Block[]> {
+    getDistBlocks = async (): Promise<Block[]> => {
         const dist = await this.getBuiltContent()
         const allModifiers = dist.match(this.matchers.blockElementModifier) || []
 
@@ -94,7 +94,7 @@ export class BemPlusClassGenerator {
             }))
     }
 
-    async getPlusModifiers(filePaths: string[]) {
+    getPlusModifiers = async (filePaths: string[]) => {
         const fileContents = await getFileContents(filePaths)
         let allModifiers: string[] = []
 
@@ -130,7 +130,7 @@ export class BemPlusClassGenerator {
         return unique(allModifiers)
     }
 
-    validateSeparators() {
+    validateSeparators = () => {
         if (this.config.input.separators.modifier === this.config.input.separators.element) {
             throw new SameSeparatorError()
         }
@@ -148,7 +148,7 @@ export class BemPlusClassGenerator {
         }
     }
 
-    async getBuiltContent() {
+    getBuiltContent = async () => {
         const filePaths = await glob(`${this.distPath}/**/*.css`)
         const fileContents = await getFileContents(filePaths)
 

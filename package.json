@@ -13,9 +13,9 @@
     },
     "homepage": "https://github.com/stefanbaumeler/bem-plus#readme",
     "devDependencies": {
-        "@stylistic/eslint-plugin": "^2.6.4",
-        "eslint": "^9.9.0",
-        "typescript": "^5.5.3",
-        "typescript-eslint": "^8.1.0"
+        "@sb-lint/eslint-config-base": "^1.0.4",
+        "@sb-lint/eslint-config-ts": "^1.0.2",
+        "eslint": "^9.38.0",
+        "typescript": "^5.5.3"
     }
 }

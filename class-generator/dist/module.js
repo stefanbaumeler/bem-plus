@@ -58,7 +58,8 @@ class BemPlusModule {
     constructor(rootElement, k) {
         var _a;
         this.index = 0;
-        this.refresh = () => { };
+        this.refresh = () => {
+        };
         if (k) {
             this.index = k;
         }

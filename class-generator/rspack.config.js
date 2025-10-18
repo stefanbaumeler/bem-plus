@@ -5,7 +5,7 @@ module.exports = {
         node: true
     },
     mode: 'development',
-    entry:  {
+    entry: {
         index: './src/index.ts',
         module: './src/module.ts'
     },
@@ -14,19 +14,19 @@ module.exports = {
             {
                 test: /\.ts?$/,
                 use: 'ts-loader',
-                exclude: /node_modules/,
-            },
-        ],
+                exclude: /node_modules/
+            }
+        ]
     },
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.ts', '.js']
     },
     output: {
         filename: '[name].js',
         path: path.resolve('dist'),
         library: {
-            type: 'umd',
+            type: 'umd'
         },
         globalObject: 'this'
     }
-};
+}

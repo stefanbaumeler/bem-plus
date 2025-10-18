@@ -2,9 +2,8 @@
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "baseUrl": "./src/",
-        "rootDir": "./src/",
         "outDir": "./dist/",
         "declaration": true
     },
-    "include": ["./src/**/*"]
+    "include": ["./src/**/*", "./rspack.config.js"]
 }

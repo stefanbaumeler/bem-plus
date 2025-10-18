@@ -4,10 +4,9 @@ import { Block } from './classes/Block'
 import { getFileContents } from '../helpers'
 
 export class BemPlusSassGenerator {
-    constructor(public config: TBemPlusSassGeneratorConfigOutput) {
+    constructor (public config: TBemPlusSassGeneratorConfigOutput) {
     }
-    async generate() {
-        console.log('generating')
+    async generate () {
         const template = await this.getAllTemplates()
         const blocks = await this.getBlocks(template)
 
@@ -15,7 +14,7 @@ export class BemPlusSassGenerator {
         await Promise.all(updatePromises)
     }
 
-    async getBlocks(template: string) {
+    getBlocks = async (template: string) => {
         const filePaths = await glob('**/*.{scss,sass}', {
             ignore: 'node_modules/**'
         })
@@ -37,7 +36,7 @@ export class BemPlusSassGenerator {
         })
     }
 
-    async getAllTemplates() {
+    async getAllTemplates () {
         const filePaths = await glob(this.config.input.include, {
             ignore: this.config.input.exclude
         })

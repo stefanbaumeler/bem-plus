@@ -1,12 +1,12 @@
 import path from 'path'
 import fs from 'fs'
 import { glob } from 'glob'
-import { TBemPlusClassGeneratorProjectConfig } from './generator/schema'
+import { TBemPlusClassGeneratorProjectConfig } from '../schema'
 import type { Compilation } from 'webpack'
 
-export class BemPlusClassGeneratorProject {
+export class Project {
     prevTimestamps = new Map<string, number>()
-    constructor(public config: TBemPlusClassGeneratorProjectConfig) {
+    constructor (public config: TBemPlusClassGeneratorProjectConfig) {
     }
     getChangedFiles = (compilation: Compilation) => {
         const changedFiles: string[] = []

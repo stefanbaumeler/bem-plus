@@ -16,9 +16,10 @@ export class Block {
     importExport = ''
     autoloader = ''
 
-    constructor(public config: TBemPlusClassGeneratorProjectConfig, public name = '') {}
+    constructor (public config: TBemPlusClassGeneratorProjectConfig, public name = '') {
+    }
 
-    generateModule(rootType = 'HTMLElement') {
+    generateModule = (rootType = 'HTMLElement') => {
         const isTypeScript = this.config.output.language === EOutputLanguage.ts
 
         const rootReference = rootReferenceTemplate({
@@ -42,18 +43,18 @@ export class Block {
         })
     }
 
-    setImportExport() {
+    setImportExport = () => {
         const relativePath = path.relative(this.config.output.path, this.output)
         const pathWithoutExt = relativePath.split('.').slice(0, -1).join('.')
         const fullPath = pathWithoutExt.startsWith('.') ? pathWithoutExt : `./${pathWithoutExt}`
         this.importExport = importExportTemplate(fullPath)
     }
 
-    async setAutoloader() {
+    setAutoloader = async () => {
 
     }
 
-    async writeModule() {
+    writeModule = async () => {
         await this.setAutoloader()
 
         const filePath = path.dirname(this.output)
@@ -79,5 +80,6 @@ export class Block {
         }
     }
 
-    async init() {}
+    init = async () => {
+    }
 }

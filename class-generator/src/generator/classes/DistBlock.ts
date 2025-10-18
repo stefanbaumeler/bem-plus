@@ -4,7 +4,7 @@ import { Element } from './Element'
 import { Block } from './Block'
 
 export class DistBlock extends Block {
-    constructor({
+    constructor ({
         config, name, elementStrings, allModifiers
     }: {
         config: TBemPlusClassGeneratorProjectConfig
@@ -14,10 +14,8 @@ export class DistBlock extends Block {
     }) {
         super(config, name)
 
-        const absolutePath = path.resolve(
-            this.config.output.path,
-            config.output.filename(this.name, config.output.language)
-        )
+        const absolutePath = path.resolve(this.config.output.path,
+            config.output.filename(this.name, config.output.language))
 
         this.output = path.relative(process.cwd(), absolutePath)
         this.setImportExport()
@@ -25,11 +23,11 @@ export class DistBlock extends Block {
         this.generateModule()
     }
 
-    async setAutoloader() {
+    setAutoloader = async () => {
         this.autoloader = `    '.${this.name}': '${this.output}'`
     }
 
-    getElements(elementStrings: string[], allModifiers: string[]) {
+    getElements = (elementStrings: string[], allModifiers: string[]) => {
         this.elements = [this.config.input.rootMixinSuffix, ...elementStrings]
             .map((elementString) => new Element({
                 config: this.config,

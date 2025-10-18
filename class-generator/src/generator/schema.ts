@@ -24,7 +24,8 @@ const defaults = {
         suffix: '',
         elementClass: (elementName: string) => `${elementName}Element`,
         moduleClass: (moduleClass: string) => moduleClass,
-        onComplete: () => {}
+        onComplete: () => {
+        }
     }
 }
 
@@ -69,7 +70,7 @@ export type TBemPlusClassGeneratorProjectConfig = {
     output: typeof defaults.output
 }
 
-export function parseConfig(config: unknown): TBemPlusClassGeneratorProjectConfig[] {
+export const parseConfig = (config: unknown): TBemPlusClassGeneratorProjectConfig[] => {
     const parsed = BemPlusClassGeneratorConfig.parse(config)
 
     return parsed.map((cfg) => ({

@@ -19,7 +19,7 @@ export class PlusBlock extends Block {
 
     allModifiers: string[]
 
-    constructor({
+    constructor ({
         config, inputPath, allModifiers
     }: {
         config: TBemPlusClassGeneratorProjectConfig
@@ -34,23 +34,21 @@ export class PlusBlock extends Block {
         const fileName = path.parse(inputPath).name
         this.name = fileName.startsWith('_') ? fileName.substring(1) : fileName
 
-        const absolutePath = path.resolve(
-            config.output.mode === EOutputMode.relative ? path.dirname(inputPath) : this.config.output.path,
-            config.output.filename(this.name, config.output.language)
-        )
+        const absolutePath = path.resolve(config.output.mode === EOutputMode.relative ? path.dirname(inputPath) : this.config.output.path,
+            config.output.filename(this.name, config.output.language))
 
         this.output = path.relative(process.cwd(), absolutePath)
         this.setImportExport()
     }
 
-    async setAutoloader() {
+    setAutoloader = async () => {
         const modulePath = path.relative(process.cwd(), path.resolve(`${path.dirname(this.inputPath)}/${path.parse(this.inputPath).name}.${this.config.output.language}`))
         const existing = await getFileContents([modulePath])
 
         this.autoloader = `    '.${this.name}': '${existing.length ? modulePath : this.output}'`
     }
 
-    async init() {
+    init = async () => {
         const buffer = await fs.promises.readFile(this.inputPath).then((buffer) => buffer.toString())
         this.input = this.matchers.removeComments(buffer)
 
@@ -64,7 +62,7 @@ export class PlusBlock extends Block {
         }
     }
 
-    getElements() {
+    getElements = () => {
         const matches = ['root', ...this.input?.match(this.matchers.element(this.name)) || []]
 
         this.elements = (matches || []).map((match) => new Element({
@@ -76,7 +74,7 @@ export class PlusBlock extends Block {
         }))
     }
 
-    verifyFileIsBlock() {
+    verifyFileIsBlock = () => {
         const oneElementMatch = this.input.match(this.matchers.hasAnElement(this.name))
         const hasIndexMatch = this.input.match(this.matchers.hasIndex(this.name))
 

@@ -6,7 +6,7 @@ export type TSeparators = {
 
 export enum EOutputMode {
     absolute = 'absolute',
-    relative = 'relative',
+    relative = 'relative'
 }
 
 export enum EOutputLanguage {

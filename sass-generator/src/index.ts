@@ -7,11 +7,11 @@ import { BemPlusSassGenerator } from './generator/generator'
 
 export class BemPlusSassGeneratorPlugin {
     options: TBemPlusSassGeneratorConfigOutput
-    constructor(options: TBemPlusSassGeneratorConfigInput) {
+    constructor (options: TBemPlusSassGeneratorConfigInput) {
         this.options = BemPlusSassGeneratorConfig.parse(options)
     }
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    apply(compiler: any) {
+    apply = (compiler: any) => {
         const callback = () => {
             const generator = new BemPlusSassGenerator(this.options)
 

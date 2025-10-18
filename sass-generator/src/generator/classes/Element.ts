@@ -14,7 +14,7 @@ export class Element {
         existingElementMixin: () => new RegExp(`@mixin ${this.block}${this.config.output.separators.mixinElement}${this.name}[\\s\\S]*?((?=@mixin)|$)`, 'g')
     }
 
-    constructor({
+    constructor ({
         config, template, blockFile, block, name
     }: {
         config: TBemPlusSassGeneratorConfigOutput
@@ -33,8 +33,7 @@ export class Element {
 
         if (existingMixin?.length === 1) {
             this.mixin = existingMixin[0].trim()
-        }
-        else {
+        } else {
             this.mixin = `@mixin ${this.block}${this.config.output.separators.mixinElement}${this.name} {\n\t\n}`
         }
 
