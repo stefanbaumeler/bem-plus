@@ -229,7 +229,7 @@ export class Element {
             video: 'HTMLVideoElement'
         }
 
-        const types = this.tags.map((tag) => tagToType[tag as keyof HTMLElementTagNameMap] ?? 'HTMLElement')
+        const types = this.tags.map((tag) => tagToType[tag as keyof HTMLElementTagNameMap] ?? 'HTMLElement').sort()
 
         return types.join(' | ') || 'HTMLElement'
     }
