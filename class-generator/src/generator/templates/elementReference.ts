@@ -7,7 +7,8 @@ export const elementReferenceTemplate = ({
     className,
     block,
     element,
-    separators
+    separators,
+    type
 }: {
     isTypeScript: boolean
     className: string
@@ -16,14 +17,15 @@ export const elementReferenceTemplate = ({
     block: string
     element: Element
     separators: TSeparators
+    type: string
 }) => {
     if (element.props.single) {
-        const selector = `this.root.el.querySelector${angleType(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')`
+        const selector = `this.root.el.querySelector${angleType(type, isTypeScript)}('.${block}${separators.element}${element.name}')`
 
         return `
-const ${camel(element.escapedName)} = ${selector};
+const ${camel(element.escapedName)} = ${selector}
 this.${camel(element.escapedName)} = ${camel(element.escapedName)} ? new ${className}(${camel(element.escapedName)}) : undefined`
     }
 
-    return `this.${camel(element.escapedName)} = [...this.root.el.querySelectorAll${angleType(element.props.type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el))`
+    return `this.${camel(element.escapedName)} = [...this.root.el.querySelectorAll${angleType(type, isTypeScript)}('.${block}${separators.element}${element.name}')].map((el) => new ${className}(el))`
 }

@@ -1,6 +1,6 @@
 import { TSeparators } from '../types';
 import { Element } from '../classes/Element';
-export declare const elementReferenceTemplate: ({ isTypeScript, className, block, element, separators }: {
+export declare const elementReferenceTemplate: ({ isTypeScript, className, block, element, separators, type }: {
     isTypeScript: boolean;
     className: string;
     prefix?: string;
@@ -8,4 +8,5 @@ export declare const elementReferenceTemplate: ({ isTypeScript, className, block
     block: string;
     element: Element;
     separators: TSeparators;
+    type: string;
 }) => string;

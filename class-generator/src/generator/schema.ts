@@ -5,6 +5,7 @@ const defaults = {
     strategy: EStrategy.dist,
     input: {
         include: ['**/*.{scss,sass}'],
+        templates: [] as string[],
         exclude: ['node_modules/**'],
         excludeBlocks: [] as string[],
         rootMixinSuffix: 'root',
@@ -37,6 +38,7 @@ const SeparatorsSchema = z.object({
 
 const InputSchema = z.object({
     include: z.array(z.string()).optional(),
+    templates: z.array(z.string()).optional(),
     exclude: z.array(z.string()).optional(),
     excludeBlocks: z.array(z.string()).optional(),
     rootMixinSuffix: z.string().optional(),

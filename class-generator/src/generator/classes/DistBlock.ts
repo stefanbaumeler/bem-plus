@@ -18,22 +18,23 @@ export class DistBlock extends Block {
             config.output.filename(this.name, config.output.language))
 
         this.output = path.relative(process.cwd(), absolutePath)
-        this.setImportExport()
-        this.getElements(elementStrings, allModifiers)
-        this.generateModule()
+        this.importExport = this.getImportExport()
+        this.elements = this.getElements(elementStrings, allModifiers)
+        this.module = this.generateModule()
     }
 
-    setAutoloader = async () => {
-        this.autoloader = `    '.${this.name}': '${this.output}'`
+    getAutoloader = async () => {
+        return `    '.${this.name}': '${this.output}'`
     }
 
     getElements = (elementStrings: string[], allModifiers: string[]) => {
-        this.elements = [this.config.input.rootMixinSuffix, ...elementStrings]
+        return [this.config.input.rootMixinSuffix, ...elementStrings]
             .map((elementString) => new Element({
                 config: this.config,
                 name: elementString.split(this.config.input.separators.element)[0],
                 blockName: this.name,
-                allModifiers
+                allModifiers,
+                tags: []
             }))
     }
 }

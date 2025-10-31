@@ -3,7 +3,6 @@ import { glob } from 'glob'
 import { EOutputMode, EStrategy } from './types'
 import path from 'node:path'
 import { PlusBlock } from './classes/PlusBlock'
-import { Block } from './classes/Block'
 import { unique, getFileContents } from '../helpers'
 import { DistBlock } from './classes/DistBlock'
 import { Barrel } from './classes/Barrel'
@@ -13,7 +12,10 @@ import { Autoloader } from './classes/Autoloader'
 
 export class BemPlusClassGenerator {
     distPath = ''
-    blocks: Block[] = []
+    blocks: (DistBlock | PlusBlock)[] = []
+    templateTagMap: {
+        [key: string]: string
+    } = {}
     matchers = {
         bemSeparator: new RegExp(`${this.config.input.separators.element}|${this.config.input.separators.modifier}`),
         blockElement: new RegExp(`[^(\\d.\\r\\n]*${this.config.input.separators.element}.+?(?=${this.config.input.separators.modifier}|[ .,[:#{)>+])`, 'g'),
@@ -22,7 +24,8 @@ export class BemPlusClassGenerator {
         elementName: (block: string) => new RegExp(`(?<!(\\/\\/.*))(?<=@mixin ${block}${this.config.input.separators.mixinElement})[^{ (]*`),
         subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root| \\.).*(?<!([ {]))', 'g'),
         ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ ,:>+~.#[|)\\s]*`, 'g'),
-        subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^ ),:>+~.#[|\\s]*`, 'g')
+        subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^ ),:>+~.#[|\\s]*`, 'g'),
+        template: new RegExp('(<[a-zA-Z-0-9]+)(?=[^>]*class(Name)?=["\'][^"\']*(?=[ "\'])[^"\']*["\'][^>]*>)|(?<=<[^>]*class(Name)?=["\'])((?:[^"\']|@\\(.*?\\))*)(?=["\'])', 'g')
     }
 
     constructor (public config: TBemPlusClassGeneratorProjectConfig) {
@@ -31,6 +34,9 @@ export class BemPlusClassGenerator {
 
     generate = async (distPath: string) => {
         this.distPath = distPath
+
+        this.templateTagMap = await this.getTemplateTagMap()
+
         this.blocks = this.config.strategy === EStrategy.plus ? await this.getPlusBlocks() : await this.getDistBlocks()
 
         await this.initBlocks()
@@ -63,20 +69,21 @@ export class BemPlusClassGenerator {
     }
 
     getPlusBlocks = async () => {
-        const filePaths = await glob(this.config.input.include, {
+        const stylePaths = await glob(this.config.input.include, {
             ignore: this.config.input.exclude
         })
 
-        const allModifiers = await this.getPlusModifiers(filePaths)
+        const allModifiers = await this.getPlusModifiers(stylePaths)
 
-        return filePaths.map((filePath) => new PlusBlock({
+        return stylePaths.map((stylePath) => new PlusBlock({
             config: this.config,
-            inputPath: filePath,
-            allModifiers
+            inputPath: stylePath,
+            allModifiers,
+            templateTagMap: this.templateTagMap
         }))
     }
 
-    getDistBlocks = async (): Promise<Block[]> => {
+    getDistBlocks = async () => {
         const dist = await this.getBuiltContent()
         const allModifiers = dist.match(this.matchers.blockElementModifier) || []
 
@@ -128,6 +135,34 @@ export class BemPlusClassGenerator {
         })
 
         return unique(allModifiers)
+    }
+
+    getTemplateTagMap = async () => {
+        const templatePaths = await glob(this.config.input.templates, {
+            ignore: this.config.input.exclude
+        })
+
+        const templates = await getFileContents(templatePaths)
+
+        const tagMap: {
+            [key: string]: string
+        } = {}
+
+        const matches = templates.flatMap((template) => {
+            return template.contents.match(this.matchers.template) || []
+        })
+
+        matches.forEach((tagOrClass, k) => {
+            if (tagOrClass.startsWith('<')) {
+                const tag = tagOrClass.substring(1)
+
+                if (matches[k + 1] && !matches[k + 1].startsWith('<')) {
+                    tagMap[tag] = `${tagMap[tag] ?? ''} ${matches[k + 1].replace(/@\([^"']*(?=")|@[^ ]*|["'&|)]|\n/g, '')}`
+                }
+            }
+        })
+
+        return tagMap
     }
 
     validateSeparators = () => {

@@ -29,7 +29,9 @@ export class Block {
         })
 
         const elementTemplates = this.elements.map((element) => element.generateTemplates(this.name, isTypeScript))
-        this.module = moduleTemplate({
+
+        return moduleTemplate({
+            rootSelector: `.${this.name}`,
             type: rootType,
             isTypeScript,
             elementClasses: elementTemplates.map((templateGroup) => templateGroup.class).join('\n'),
@@ -43,19 +45,20 @@ export class Block {
         })
     }
 
-    setImportExport = () => {
+    getImportExport = () => {
         const relativePath = path.relative(this.config.output.path, this.output)
         const pathWithoutExt = relativePath.split('.').slice(0, -1).join('.')
         const fullPath = pathWithoutExt.startsWith('.') ? pathWithoutExt : `./${pathWithoutExt}`
-        this.importExport = importExportTemplate(fullPath)
+
+        return importExportTemplate(fullPath)
     }
 
-    setAutoloader = async () => {
-
+    getAutoloader = async (): Promise<string> => {
+        return await new Promise(() => '')
     }
 
     writeModule = async () => {
-        await this.setAutoloader()
+        this.autoloader = await this.getAutoloader()
 
         const filePath = path.dirname(this.output)
 

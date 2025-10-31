@@ -9,9 +9,9 @@ export declare class Block {
     importExport: string;
     autoloader: string;
     constructor(config: TBemPlusClassGeneratorProjectConfig, name?: string);
-    generateModule: (rootType?: string) => void;
-    setImportExport: () => void;
-    setAutoloader: () => Promise<void>;
+    generateModule: (rootType?: string) => string;
+    getImportExport: () => string;
+    getAutoloader: () => Promise<string>;
     writeModule: () => Promise<void>;
     init: () => Promise<void>;
 }

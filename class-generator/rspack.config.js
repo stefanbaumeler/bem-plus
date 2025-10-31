@@ -1,32 +1,64 @@
-const path = require('path')
+import path from 'path'
 
-module.exports = {
+const common = {
     externalsPresets: {
         node: true
     },
-    mode: 'development',
-    entry: {
-        index: './src/index.ts',
-        module: './src/module.ts'
+    mode: 'production',
+    entry: './src/index.ts',
+    resolve: {
+        extensions: ['.ts', '.js']
     },
     module: {
         rules: [
             {
-                test: /\.ts?$/,
-                use: 'ts-loader',
+                test: /\.ts$/,
+                use: [
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            transpileOnly: true,
+                            compilerOptions: {
+                                module: 'esnext'
+                            }
+                        }
+                    }
+                ],
                 exclude: /node_modules/
             }
         ]
-    },
-    resolve: {
-        extensions: ['.ts', '.js']
-    },
+    }
+};
+
+// ESM build
+const esmConfig = {
+    ...common,
     output: {
-        filename: '[name].js',
-        path: path.resolve('dist'),
+        path: path.resolve(process.cwd(), 'dist'),
+        filename: 'index.js',
         library: {
+            type: 'module'
+        },
+        clean: false
+    },
+    experiments: {
+        outputModule: true
+    }
+};
+
+// UMD build
+const umdConfig = {
+    ...common,
+    output: {
+        path: path.resolve(process.cwd(), 'dist'),
+        filename: 'index.umd.js',
+        library: {
+            name: '@bem-plus/class-generator',
             type: 'umd'
         },
-        globalObject: 'this'
+        globalObject: 'this',
+        clean: false
     }
-}
+};
+
+export default [esmConfig, umdConfig];

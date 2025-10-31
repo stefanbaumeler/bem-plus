@@ -4,6 +4,7 @@ declare const defaults: {
     strategy: EStrategy;
     input: {
         include: string[];
+        templates: string[];
         exclude: string[];
         excludeBlocks: string[];
         rootMixinSuffix: string;
@@ -30,6 +31,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodArray<z.ZodObject<{
     strategy: z.ZodOptional<z.ZodUnion<[z.ZodLiteral<"plus">, z.ZodLiteral<"dist">]>>;
     input: z.ZodOptional<z.ZodObject<{
         include: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        templates: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         exclude: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         excludeBlocks: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         rootMixinSuffix: z.ZodOptional<z.ZodString>;
@@ -49,6 +51,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodArray<z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         include?: string[] | undefined;
         exclude?: string[] | undefined;
+        templates?: string[] | undefined;
         excludeBlocks?: string[] | undefined;
         rootMixinSuffix?: string | undefined;
         separators?: {
@@ -59,6 +62,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodArray<z.ZodObject<{
     }, {
         include?: string[] | undefined;
         exclude?: string[] | undefined;
+        templates?: string[] | undefined;
         excludeBlocks?: string[] | undefined;
         rootMixinSuffix?: string | undefined;
         separators?: {
@@ -105,6 +109,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodArray<z.ZodObject<{
     input?: {
         include?: string[] | undefined;
         exclude?: string[] | undefined;
+        templates?: string[] | undefined;
         excludeBlocks?: string[] | undefined;
         rootMixinSuffix?: string | undefined;
         separators?: {
@@ -130,6 +135,7 @@ export declare const BemPlusClassGeneratorConfig: z.ZodArray<z.ZodObject<{
     input?: {
         include?: string[] | undefined;
         exclude?: string[] | undefined;
+        templates?: string[] | undefined;
         excludeBlocks?: string[] | undefined;
         rootMixinSuffix?: string | undefined;
         separators?: {

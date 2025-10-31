@@ -38,3 +38,7 @@ export class BemPlusClassGeneratorPlugin {
         compiler.hooks.afterEmit.tap('@bem-plus/class-generator plugin', callback)
     }
 }
+
+export {
+    addModule, BemPlusModule
+} from './module'

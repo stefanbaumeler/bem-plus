@@ -4,8 +4,7 @@
         "module": "ESNext",
         "target": "ES2018",
         "allowJs": true,
-        "moduleResolution": "node",
-        "esModuleInterop": true,
+        "moduleResolution": "bundler",
         "sourceMap": true,
         "strict": true,
         "noEmit": false

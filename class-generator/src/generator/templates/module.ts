@@ -1,6 +1,7 @@
 import { indent, angleType, colonType } from '../../helpers'
 
 export const moduleTemplate = ({
+    rootSelector,
     type,
     isTypeScript,
     className,
@@ -12,6 +13,7 @@ export const moduleTemplate = ({
     prefix = '',
     suffix = ''
 }: {
+    rootSelector: string
     type: string
     isTypeScript: boolean
     className: string
@@ -27,10 +29,12 @@ export const moduleTemplate = ({
 
 ${prefix}
 
-import { BemPlusModule } from '@bem-plus/class-generator/src/module'
+import { BemPlusModule } from '@bem-plus/class-generator/module'
 ${elementClasses}
 export class ${className} extends BemPlusModule {
     root;
+
+    static selector = '${rootSelector}';
 
     ${indent(elementProperties, 1)}
     constructor(rootElement${colonType('Element', isTypeScript)}) {

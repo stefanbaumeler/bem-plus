@@ -1,10 +1,13 @@
 import { TBemPlusClassGeneratorProjectConfig } from './schema';
 import { PlusBlock } from './classes/PlusBlock';
-import { Block } from './classes/Block';
+import { DistBlock } from './classes/DistBlock';
 export declare class BemPlusClassGenerator {
     config: TBemPlusClassGeneratorProjectConfig;
     distPath: string;
-    blocks: Block[];
+    blocks: (DistBlock | PlusBlock)[];
+    templateTagMap: {
+        [key: string]: string;
+    };
     matchers: {
         bemSeparator: RegExp;
         blockElement: RegExp;
@@ -14,14 +17,18 @@ export declare class BemPlusClassGenerator {
         subSelectors: RegExp;
         ampModifier: RegExp;
         subModifier: RegExp;
+        template: RegExp;
     };
     constructor(config: TBemPlusClassGeneratorProjectConfig);
     generate: (distPath: string) => Promise<void>;
     initBlocks: () => Promise<void>;
     writeModules: () => Promise<void>;
     getPlusBlocks: () => Promise<PlusBlock[]>;
-    getDistBlocks: () => Promise<Block[]>;
+    getDistBlocks: () => Promise<DistBlock[]>;
     getPlusModifiers: (filePaths: string[]) => Promise<string[]>;
+    getTemplateTagMap: () => Promise<{
+        [key: string]: string;
+    }>;
     validateSeparators: () => void;
     getBuiltContent: () => Promise<string>;
 }
