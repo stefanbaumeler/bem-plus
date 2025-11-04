@@ -76,7 +76,8 @@ export class PlusBlock extends Block {
         const flatMap = Object.values(this.templateTagMap).join(' ')
         const templateMatches = [...new Set(flatMap.match(this.matchers.templateElement(this.name)) || [])].filter((entry) => !styleMatches.includes(entry))
 
-        return [...styleMatches, ...templateMatches]
+        return [...new Set([...styleMatches, ...templateMatches])]
+            .sort()
             .map((match) => {
                 const tags = match === 'root' ? [] : Object.entries(this.templateTagMap)
                     .filter(([,value]) => ` ${value} `.includes(` ${this.name}${this.config.input.separators.element}${match} `))
