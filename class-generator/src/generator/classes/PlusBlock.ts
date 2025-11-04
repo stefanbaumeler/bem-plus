@@ -13,7 +13,7 @@ export class PlusBlock extends Block {
     matchers = {
         removeComments: (input: string) => input.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*/g, ''),
         element: (block: string) => new RegExp(`(?<=&${this.config.input.separators.element})[^\\s{(]*(?=.*\\r?\\n.*@include ${block}${this.config.input.separators.mixinElement})`, 'g'),
-        templateElement: (block: string) => new RegExp(`(?<= ?${block}${this.config.input.separators.element})[^- ]+(?:-[^- ]+)*(?=--| |$)`, 'g'),
+        templateElement: (block: string) => new RegExp(`(?<=\\s?${block}${this.config.input.separators.element})[^-\\s]+(?:-[^-\\s]+)*(?=--|\\s|$)`, 'g'),
         hasIndex: (block: string) => new RegExp(`@mixin ${block}[^.-]*\\.${block} {`),
         hasAnElement: (block: string) => new RegExp(`@mixin ${block}${this.config.input.separators.mixinElement}.*`),
         rootProps: (block: string) => new RegExp(`(?<=@mixin ${block}${this.config.input.separators.mixinElement}root\\s*\\()[^)]*`, 'g')
@@ -74,7 +74,9 @@ export class PlusBlock extends Block {
     getElements = () => {
         const styleMatches = ['root', ...this.input?.match(this.matchers.element(this.name)) || []]
         const flatMap = Object.values(this.templateTagMap).join(' ')
-        const templateMatches = [...new Set(flatMap.match(this.matchers.templateElement(this.name)) || [])].filter((entry) => !styleMatches.includes(entry))
+        const templateMatches = [...new Set(flatMap.match(this.matchers.templateElement(this.name)) || [])]
+            .filter((entry) => !styleMatches.includes(entry))
+            .map((entry) => entry.trim())
 
         return [...new Set([...styleMatches, ...templateMatches])]
             .sort()
