@@ -215,7 +215,7 @@ now in your `TeaserList` class you can inject the `Filter` instances:
 ```typescript
 export class TeaserList extends TeaserListBase {
     // Inject the filters in the constructor
-    constructor(rootEl: HTMLElement, public filters: Filter[]) {
+    constructor(rootEl: HTMLElement, public filter: Filter) {
         super(rootEl)
 
         // this.filters will contain all instances of Filter inside this instance of TeaserList.
@@ -235,7 +235,44 @@ export class TeaserList extends TeaserListBase {
 }
 ```
 
-#### addModule
+This takes the first instance of "filter" inside each "teaser-list" instance and injects it. But what if you want to inject multiple instances of "filter" that exist inside "teaser-list"? You have to let `addModule` know that you want to inject multiple. You can do this by wrapping `Filter` into an extra set of brackets:
+
+```typescript
+addModule(TeaserList, [[Filter]])
+```
+
+Inside TeaserList, you have to update the constructor:
+
+```typescript
+export class TeaserList extends TeaserListBase {
+    constructor(rootEl: HTMLElement, public filters: Filter[]) {
+        super(rootEl)
+
+        // ...
+    }
+}
+```
+
+Now you have access to all instances of "filter" inside TeaserList. It's the same difference as with `$single: true`.
+
+You can also inject multiple modules into another module:
+
+```typescript
+addModule(TeaserList, [[Filter], [Tooltip], Whatever])
+```
+
+Note that the order of the injected modules must match the way you access them in your constructor:
+
+```typescript
+export class TeaserList extends TeaserListBase {
+    constructor(rootEl: HTMLElement, public filters: Filter[], public tooltips: Tooltip[], public whatever?: Whatever) {
+        super(rootEl)
+
+        // ...
+    }
+}
+```
+
 
 ## Config
 
