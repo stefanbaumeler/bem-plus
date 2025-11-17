@@ -1,16 +1,32 @@
 {
     "name": "@bem-plus/class-generator",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "description": "",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
-    "keywords": ["BEM", "CSS", "SCSS", "Sass", "generator", "webpack", "node", "typescript", "ts", "oop", "object-oriented", "class"],
+    "keywords": [
+        "BEM",
+        "CSS",
+        "SCSS",
+        "Sass",
+        "generator",
+        "webpack",
+        "node",
+        "typescript",
+        "ts",
+        "oop",
+        "object-oriented",
+        "class"
+    ],
     "scripts": {
         "build": "rspack build & tsc --emitDeclarationOnly"
     },
-    "files": ["dist/*", "./src/module.ts"],
+    "files": [
+        "dist/*",
+        "./src/module.ts"
+    ],
     "repository": {
         "type": "git",
         "url": "git+https://github.com/stefanbaumeler/bem-plus.git"
