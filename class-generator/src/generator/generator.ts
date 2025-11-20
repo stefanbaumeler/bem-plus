@@ -134,7 +134,7 @@ export class BemPlusClassGenerator {
             }
         })
 
-        return unique(allModifiers)
+        return unique(allModifiers.sort())
     }
 
     getTemplateTagMap = async () => {
