@@ -22,7 +22,7 @@ export class BemPlusClassGenerator {
         blockElementModifier: new RegExp(`(?<!(var\\(|{|;))[^(.\\n!{]*${this.config.input.separators.modifier}[^ .,[:#{)>+]*`, 'g'),
         elementMixins: (block: string) => new RegExp(`(?<!(\\/\\/.*))@mixin ${block}${this.config.input.separators.mixinElement}[\\s\\S]*?(?<![ \\S])}`, 'g'),
         elementName: (block: string) => new RegExp(`(?<!(\\/\\/.*))(?<=@mixin ${block}${this.config.input.separators.mixinElement})[^{ (]*`),
-        subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root| \\.).*(?<!([ {]))', 'g'),
+        subSelectors: new RegExp('(?<!(\\/\\/.*))(&|@at-root|@scope| \\.).*(?<!([ {]))', 'g'),
         ampModifier: new RegExp(`(?<!(\\/\\/.*))(?<=&${this.config.input.separators.modifier})[^ ,:>+~.#[|)\\s]*`, 'g'),
         subModifier: new RegExp(`(?<!(\\/\\/.*))(?<=\\.)[^)\\s.]*${this.config.input.separators.modifier}[^ ),:>+~.#[|\\s]*`, 'g'),
         template: new RegExp('(<[a-zA-Z-0-9]+)(?=[^>]*class(Name)?=["\'][^"\']*(?=[ "\'])[^"\']*["\'][^>]*>)|(?<=<[^>]*class(Name)?=["\'])((?:[^"\']|@\\(.*?\\))*)(?=["\'])', 'g')

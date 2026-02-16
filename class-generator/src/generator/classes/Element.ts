@@ -88,7 +88,10 @@ export class Element {
             const propStrings = match[0].substring(1).split(/,[ \t]*\$/g)
             propStrings.forEach((propString) => {
                 const keyValue = propString.split(':')
-                props[keyValue[0].trim()] = keyValue[1].trim()
+
+                if (keyValue[0]) {
+                    props[keyValue[0].trim()] = keyValue[1].trim()
+                }
             })
         }
 
